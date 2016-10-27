@@ -11,10 +11,24 @@ Contoso Mart is a fictitious online retailer with a catalog of ~100k products an
 ## Outline
 - [Data Acquisition](#Data-Acquisition)
    - [Evidence of User-Product Affinity](#Evidence-of-User-Product-Affinity)
+   - [User Descriptions](#User-Descriptions)
+   - [Product Descriptions](#Product-Descriptions)
+   - [Product Recommendation Quality Assessment](#Product-Recommendation-Quality-Assessment)
 - [Feature Extraction](#Feature-Extraction)
-- [Model Selection](#Model-Selection)
-- [Training and Validation](#Training-and-Validation)
+   - [Affinity Scores](#Affinity Scores)
+   - [User Description Augmentation](#User-Description-Augmentation)
+- [Hybrid Recommender Model Selection](#Hybrid-Recommender-Model-Selection)
+   - [Matchbox Recommender in Azure Machine Learning Studio](#Matchbox-Recommender-in-Azure-Machine-Learning-Studio)
+   - [Recommendations API](#Recommendations-API)
+   - [Custom Implementation](#Custom-Implementation)
+- [Best Practices for Model Training and Evaluation](#Best-Practices-for-Model-Training-and-Evaluation)
+   - [Evaluation Set Creation](#Evaluation-Set-Creation)
+   - [Hyperparameter Selection](#Hyperparameter-Selection)
+   - [Evaluation Metrics](#Evaluation-Metrics)
 - [Deployment](#Deployment)
+   - [Creating and Consuming a Web Service](#Creating-and-Consuming-a-Web-Service)
+   - [A/B and Multiworld Testing](#ab)
+   - [Model Retraining](#Model-Retraining)
 
 ## Data Acquisition
 
@@ -126,7 +140,7 @@ UserID  ProductID  Affinity
    3        2          7
   ...      ...        ...
 ```
-To arrive at an affinity score, retailers typically combine multiple forms of evidence -- including purchases, ratings, returns, wishlists, recommendation clickthroughs, and product description page visits -- using a combination of analytics and industry knowledge. Joseph Mart calculates affinity scores as a weighted sum of purchase count, product recommendation clickthrough count, and number of ignored product recommendations. The weightings for each event type in affinity score calculation can be explored using a hyperparameter search as described in the [Training and Evaluation](#Training-and-Evaluation) section below.
+To arrive at an affinity score, retailers typically combine multiple forms of evidence -- including purchases, ratings, returns, wishlists, recommendation clickthroughs, and product description page visits -- using a combination of analytics and industry knowledge. Contoso Mart calculates affinity scores as a weighted sum of purchase count, product recommendation clickthrough count, and number of ignored product recommendations. The weightings for each event type in affinity score calculation can be explored using a hyperparameter search as described in the [Training and Evaluation](#Training-and-Evaluation) section below.
 
 ### User Description Augmentation
 
@@ -182,15 +196,15 @@ Another common method for observation partitioning is to divide observations chr
 
 ### Hyperparameter Selection
 
-** Affinity Score Calculation Parameters **
+**Affinity Score Calculation Parameters**
 
 Many hybrid recommender implementations require that an affinity score be supplied for each user-product pair of interest. The formulas retailers use to combine purchase, clickthrough, review, etc. records into a single affinity score are often the result of the retailers' own analytical investigations and may be considered confidential. Contoso Mart uses a formula of the following form:
 
-$$ \textrm{Affinity score: } \min \left( 10, \max \left( 1, b + \sum_{i} w_i c_i \right) \right)$$
+$$ \textrm{Affinity score: } \min \left( 10, \max \left( 1, b + \sum_{i} w_i c_i \right) \right) $$
 
 where $b$ is a constant bias term, $c_i$ is the count of times that behavior $i$ was performed for the given user-product pair, and $w_i$ are the weights which determine how strongly each behavior type contributes to the affinity score. (Notice that the affinity scores have been rectified to produce scores that always lie in the range 1-10.) Contoso Mart has applied insider knowledge of the industry to make educated guesses about possible bias and weight values. Cross-validation may be used to compare model performance using a small number of possible parameter sets, with the optimal set used to train the final model.
 
-** Latent Dimension and Training Round Count Parameters**
+**Latent Dimension and Training Round Count Parameters**
 
 Collaborative filtering models fit a representation for each user and product in a low-dimensional space. Both performance and runtime will generally rise with the number of latent dimensions and training rounds. After selecting an affinity score calculation method, Contoso Mart would like to examine the trade-off between performance and runtime to make an informed selection of parameters. Cross-validation is again used to test a small number of possible parameter combinations. The parameter combination which maximizes performance is used to train a model using the complete training data set.
 
@@ -208,7 +222,7 @@ The first step in operationalizing the hybrid recommender's product suggestions 
 
 Many retailer websites are created using common programming languages that support calling and parsing responses from web services. The web service's sample code snippet can be integrated into the existing website code to request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page. To reduce lag and ensure variability in recommendations, some retailers request multiple recommendations for each active user and store these for quick access during future page rendering.
 
-### A/B and Multiworld Testing
+### A/B and Multiworld Testing <a name="ab"></a>
 
 Product suggestions are vital drivers of online retail revenue: new recommender models can be gradually introduced to minimize any negative impact if their real-world performance proves to be suboptimal. After creating a hybrid recommender, a retailer may begin displaying its product suggestions to a small subset of users while continuing to show the previous model's suggestions to all other users. This common practice, called A/B testing, allows the retailer to compare speed and quality (e.g. clickthrough/conversion rate) metrics of both recommenders while controlling for other factors. When the retailer is convinced that the hybrid recommender model is reliable and offered superior product suggestions, it can begin providing the new model's suggestions to all users.
 
