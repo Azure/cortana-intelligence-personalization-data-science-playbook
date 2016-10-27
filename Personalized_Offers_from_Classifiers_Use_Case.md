@@ -2,11 +2,11 @@
 
 ## Executive Summary
 
-To help their customers find relevant products and offers on large websites, many online retailers highlight offerings by embedding suggestions in their webpages. Users strongly prefer that these advertised offers be tailored to their own interests: useless information creates clutter and detracts from their experience. User behaviors such as browsing activity, product ratings, and purchases can be leveraged to predict which offers they will find appealing. When the set of offers under consideration is relatively small and consistent over time, dense information on user responses can accumulate. This input type is ideal for training classification models, with potential advantages including fast response time, lightweight representation, and explainable decision-making processes (depending on the classifier type). This use case suggests general best practices while highlighting the [Cortana Intelligence Industry Solution](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions) on [Personalized Offers in Retail](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions/tree/master/Marketing/Personalized%20Offers) as an illustrative example.
+To help their customers navigate large websites, many online retailers highlight their offerings by embedding suggestions in each webpage. Users strongly prefer that these advertised offers be tailored to their own interests: useless information creates clutter and detracts from their experience. Retailers can leverage user behaviors like browsing activity, product ratings, and purchases to predict which offers a given user will find appealing. When the set of offers under consideration is relatively small and consistent over time, dense information on user responses to each offer accumulates. This input type is ideal for training classifiers, a machine learning model type with potential advantages including fast response time, lightweight representation, and explainable results. This document introduces data scientists and other indsutry professionals to best practices for offer personalization using classifiers. In addition to providing general advice, this document follows the use case from the [Cortana Intelligence Industry Solution](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions) on [Personalized Offers in Retail](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions/tree/master/Marketing/Personalized%20Offers) as an illustrative example.
 
 ## Background on Example Retailer: Contoso Mart
 
-Contoso Mart is a fictitious online retailer that has approved a selection of 25 offers for all users. After experimenting with methods to highlight these offers, Contoso Mart has found that users prefer to see only one offer displayed on a web page at a time. Contoso Mart hopes to improve the offer clickthrough rate by displaying the offer deemed most appealing for each user based on both recent and longterm browsing history. Since the offers are relatively consistent with time and few in number, Contoso Mart's records on user interactions with each offer are dense and well-suited for training a multiclass classifier. Contoso Mart's personalized offer development experience will be highlighted in each section of this use case.
+Contoso Mart is a fictitious online retailer that has approved a selection of 25 offers for all users. After experimenting with methods to highlight these offers, Contoso Mart has found that users prefer to see only one offer displayed on a web page at a time. Contoso Mart hopes to improve the offer clickthrough rate by displaying the offer deemed most appealing for each user based on the user's recent and longterm browsing history. Since the offers are relatively static and few in number, Contoso Mart's records on user interactions with each offer are dense and well-suited for training a multiclass classifier. Each stage of Contoso Mart's personalized offer development experience will be highlighted in the appropriate section of this document.
 
 ## Outline
 - [Data Acquisition](#Data-Acquisition)
@@ -27,7 +27,7 @@ Contoso Mart is a fictitious online retailer that has approved a selection of 25
    - [Hyperparameter Selection](#Hyperparameter-Selection)
    - [Evaluation Metrics for Multiclass Classifiers](#Evaluation-Metrics-for-Multiclass-Classifiers)
    - [Example: Contoso Mart](#tecm)
-- [Operationalization and Deployment](#Operationalization-and-Deployment)
+- [Operationalization and Deployment](#od)
    - [Creating and Consuming a Web Service](#Creating-and-Consuming-a-Web-Service)
    - [A/B and Multiworld Testing](#ab)
    - [Model Retraining](#Model-Retraining)
@@ -35,13 +35,15 @@ Contoso Mart is a fictitious online retailer that has approved a selection of 25
 
  ## Data Acquisition
 
+The first stage in implementation of a classifier for personalized offer recommendations is the collection of data that will be used to train the model. In particular, personalization requires collection of user-specific information such as interests, demographics, and behaviors. The data collected must be sufficient to construct labels (the property of each data point that the classifier will predict) as well as informative features that can be used to predict the labels.
+
 ### User Behaviors
 
 **Offer Clickthroughs**
 
-A user's response provides the most direct feedback on their interest in an offer. In the most common data collection scheme, a retailer records each offer displayed to a user and each time an offer is clicked: these records can be compared later, using timestamps or unique URIs, to determine which offers were ignored. For technical simplicity, some retailers choose to record only clickthrough events.
+User responses to presented offers -- i.e., whether each offer was clicked or ignored -- constitute the most direct form of evidence for a user's interest or disinterest in an offer. In the most common data collection scheme, a retailer records each offer displayed to a user and each time an offer is clicked: these records can be compared later, using timestamps or unique URIs, to determine which offers were ignored. For technical simplicity, some retailers choose to record only clickthrough events.
 
-Note that offer clickthrough data can only be collected after offers start being displayed on the retailer's website. A retailer can begin collecting data by displaying a randomly-selected offer, perhaps with a specified bias based on the user's demographic information or profile. If the distribution of offers displayed to each user is non-random, downsampling (or upsampling) may be used to balance the dataset.
+Note that offer clickthrough data can only be collected after offers start being displayed on the retailer's website. A retailer can begin collecting data by displaying offers at random or in a targeted fashion. If the distribution of offers displayed to each user is non-random, downsampling (or upsampling) may be used to balance the dataset.
 
 **Page Views**
 
@@ -245,7 +247,7 @@ If desired, Contoso Mart could also calculate arbitrary metrics of interest usin
 
 For additional information on model evaluation in AML Studio, please see Gary Ericson's [How to evaluate model performance in Azure Machine Learning](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-evaluate-model-performance/)
 
-## Operationalization and Deployment
+## Operationalization and Deployment <a name="od"></a>
 
 ### Creating and Consuming a Web Service
 
