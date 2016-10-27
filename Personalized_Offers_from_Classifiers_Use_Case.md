@@ -129,7 +129,7 @@ Under this scheme, an *n*-class classifier is constructed from *n*-choose-2 = *n
 
 **One vs. All**
 
-An *n*-class classifier can also be constructed from *n* binary classifiers, provided that the classifier returns a score indicating confidence (in addition to an assigned label) for each data point. Each classifier *f<sub>l</sub>: X -> __R__* is trained to return a value indicating its confidence that a data point *__x__* has label *l*. Data points are assigned the label corresponding to the most confident classifier, i.e. *f(__x__) = \arg\max<sub>l</sub> f<sub>l</sub>(__x__)*. A disadvantage of this approach is that it requires a classifier type that can assure similarly-scaled confidence scores and increase the probability that classifiers will be trained on imbalanced datasets.
+An *n*-class classifier can also be constructed from *n* binary classifiers, provided that the classifier returns a score indicating confidence (in addition to an assigned label) for each data point. Each classifier *f<sub>l</sub>: X -> __R__* is trained to return a value indicating its confidence that a data point *__x__* has label *l*. Data points are assigned the label corresponding to the most confident classifier, i.e. *f(__x__) = *arg max*<sub>l</sub> f<sub>l</sub>(__x__)*. A disadvantage of this approach is that it requires a classifier type that can assure similarly-scaled confidence scores and increase the probability that classifiers will be trained on imbalanced datasets.
 
 Some binary classifier models have also been extended (with model-specific algorithms) to allow efficient training and scoring without explicitly constructing binary classifiers as described above.
 
