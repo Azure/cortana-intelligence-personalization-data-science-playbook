@@ -200,7 +200,7 @@ Another common method for observation partitioning is to divide observations chr
 
 Many hybrid recommender implementations require that an affinity score be supplied for each user-product pair of interest. The formulas retailers use to combine purchase, clickthrough, review, etc. records into a single affinity score are often the result of the retailers' own analytical investigations and may be considered confidential. Contoso Mart uses a formula of the following form:
 
-![Affinity Score Formula](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/eqns/affinity_score.PNG?raw=true)
+<img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/eqns/affinity_score.PNG?raw=true" align="center">
 
 where *b* is a constant bias term, *c<sub>i</sub>* is the count of times that behavior *i* was performed for the given user-product pair, and *w<sub>i</sub>* are the weights which determine how strongly each behavior type contributes to the affinity score. (Notice that the affinity scores have been rectified to produce scores that always lie in the range 1-10.) Contoso Mart has applied insider knowledge of the industry to make educated guesses about possible bias and weight values. Cross-validation may be used to compare model performance using a small number of possible parameter sets, with the optimal set used to train the final model.
 
