@@ -33,7 +33,8 @@ Contoso Mart is a fictitious online retailer that has approved a selection of 25
    - [Model Retraining](#Model-Retraining)
    - [Example: Contoso Mart](#odcm)
 
- ## Data Acquisition
+
+## Data Acquisition
 
 The first stage in implementation of a classifier for personalized offer recommendations is the collection of data that will be used to train the model. In particular, personalization requires collection of user-specific information such as interests, demographics, and behaviors. The data collected must be sufficient to construct labels (the property of each data point that the classifier will predict) as well as informative features that can be used to predict the labels.
 
@@ -47,40 +48,40 @@ Note that offer clickthrough data can only be collected after offers start being
 
 **Page Views**
 
-A user's browsing history may shed light on either longterm preferences or current purchase intentions, depending on the timescale of interest. Each visit to a given page adds evidence of a user's interest in the page's contents, which may correspond to interest in a related offer. A rolling tally of a user's views for each page can be maintained over any time frame of interest, with current values recorded at the time a clickthrough event is logged. Alternatively, each page view can be recorded directly in a log entry containing a timestamp and identifiers for the user and page.
+A user's browsing history may shed light on longterm preferences and current purchase intentions. Each visit to a given page adds evidence of a user's interest in the page's contents, which may correspond to interest in a related offer. A rolling tally of a user's views for each page can be maintained over any time frame of interest, with current values recorded at the time a clickthrough event is logged. Alternatively, each page view can be recorded directly in a log entry containing a timestamp and identifiers for the user and page, and rolling counts can be constructed from these logs.
 
 **Purchases, Product Reviews, and Wishlists**
 
-Interest in some offers -- in particular, product recommendations -- is highly likely to correlate with interest in specific products. In these cases, it is informative to record users' purchases, reviews, and "wishlist" contents, which can give strong indications of a user's interest in specific products. Some consideration should be given to the interpretation and relative weighting of these indicators. For example, even a highly negative review suggests that the user purchased the product in the first place: the user's interest level in the product is therefore likely to be higher than a product the user did not review or purchase at all.
+Interest in some types of offers -- in particular, product recommendations -- correlates with user interest in specific products. Records of users' purchases, reviews, and "wishlist" contents can be used to predict their interest in a product of interest. Raw data of this type is likely to be sparse: for example, the probability that a user will purchase/review/etc. any given product is low. However, dense features appropriate for training classifier models can be constructed by summing across all products in defined categories.
 
 ### User Descriptors
 
-Many online retailers request and store customer details that are likely to correlate with interest in offers. For example, customers are likely to specify their location and gender-specific appellation when entering their shipping information. Some retailers collect additional details like age and stated interests on an opt-in basis, encouraging broad participation by offering incentives (including the simple promise of personalizing the browsing experience). Additional information may be shared when users link social media accounts containing a user profile.
+Many online retailers request and store customer details that are likely to correlate with their interest in specific offers. For example, customers usually specify their location and gender-specific appellation when entering their shipping information during sign-up or check-out. Some retailers collect additional details like age and stated interests on an opt-in basis, encouraging broad participation by offering incentives. (Users may also volunteer this information once they are convinced that relevant offers will improve their browsing experience.) Additional information may be shared when users link social media accounts containing a user profile.
 
 ### Data Acquisition Example: Contoso Mart <a name="dacm"></a>
 
-Contoso Mart sells twenty-five products and advertises one of twenty-five offers (product suggestions) on each page view. Before implementing personalized offers, the highlighted offer was chosen at random and the following information was recorded for each clickthrough event:
+Contoso Mart sells twenty-five products. Every time a user requests a web page, an advertisement for one of these products is included on the page. (In other words, the type of offer that Contoso Mart hopes to personalize is a product suggestion.) Before implementing personalized offers, Contoso Mart highlighted a randomly-selected offer and recorded the following information for each clickthrough event:
 - The product was highlighted in the offer (encoded using 25 one-hot variables)
 - The webpage where the offer was displayed (25 possibilities, one corresponding to each product)
 - The count of the user's visits to each of the 25 webpages in the past minute, hour, or day (tallies maintained in near-real time using [Azure Event Hub](https://azure.microsoft.com/en-us/documentation/articles/event-hubs-overview/) and [Azure Stream Analytics](https://azure.microsoft.com/en-us/services/stream-analytics/))
 
-...for a total of 101 features. If the number of products/web pages were larger, it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
+The resulting dataset has 101 features. If the number of products/web pages were larger, it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
 
 ## Feature Extraction and Selection
 
-The core component of the model training/evaluation datasets is the offer clickthrough data, which generally contains the label of interest (viz., the identifier for the ad that was clicked), the identifier for the user who clicked it, and a timestamp. The user identifier and timestamp can be used to annotate the dataset with user-specific information like demographic properties and the user's recent behavior at the time the clickthrough occurred. This process may produce a dataset that includes more features than can be reasonably trained with the available data, and some of these features may be uninformative. Feature selection can then be used to remove superfluous features that would otherwise contribute to overfitting.
+The core component of the model training/evaluation datasets is the offer clickthrough data, which generally contains the label of interest (viz., the identifier for the ad that was clicked), the identifier for the user who clicked it, and a timestamp. The user identifier and timestamp can be used to join the dataset with semi-static user descriptions like demographic properties as well as the user's recent behavior at the time the clickthrough occurred. This process may produce a dataset that includes many features, some of which are uninformative or contribute to overfitting. Feature selection can be used to reduce the feature set while maintaining as much predictive power as possible.
 
 ### Feature Extraction
 
 **Rolling windows**
 
-Raw event logs typically include information on only one event per row. By applying rolling window techniques to these logs, we can create new features that count, for each timepoint in the log, the number of events which occurred in the last *n* minutes. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate each clickthrough data point with the most recent event counts. This technique can be used to create potentially-useful features such as "number of visits to page x in last hour".
+Raw event logs typically include information on only one event per row. Rolling window techniques can be applied to these logs to create new features that count the number of events which occurred in the *n* minutes prior to each timepoint. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate the clickthrough data with the relevant rolling event counts. This technique can be used to create potentially-useful features such as "number of user's visits to page x in last hour".
 
-Data scientists who introduce rolling counts during feature extraction must give careful thought to how these features will be computed after the model is deployed: the calculations which they perform to construct these features during offline model development may not be ideal in the time-sensitive context of the operationalized model. Data engineers and solution architects can help design a solution for near-real time calculation of these rolling counts, so that they can be provided as inputs for the trained model. If this solution is expected to have a processing delay for rolling count maintenance, that delay should be simulated during offline feature creation. (Once the solution is operational, these rolling counts should be stored with each offer clickthrough data point, rather than generated offline through feature extraction, to most accurately reflect any processing delays.)
+Data scientists who introduce rolling counts during feature extraction must give careful thought to how these features will be computed after the model is deployed. The calculations which they perform to construct features during offline model development may not be ideal in the time-sensitive context of the operationalized model.  Data engineers and solution architects can help design a solution for near-real time calculation of these rolling counts, so that they can be provided directly as inputs to the model. If a processing delay is expected for rolling count calculation, that delay should be simulated during offline feature creation. (Once the solution is operational, rolling counts can be stored with other details of each offer clickthrough, and will no longer need to be generated offline through feature extraction.)
 
 **Inferred User Descriptors**
 
-User descriptors are most useful when they have low "missingness" (fraction of data points with unknown value), but most online retailers collect this information on an opt-in basis. The utility of these features can be improved by filling in missing information with an educated guess, e.g. through imputation or classification. For example, information that is commonly provided for shipping purposes, like name and location, could be used to infer other properties like gender, socioeconomic status, or age.
+User descriptors are most useful when they have low "missingness" (fraction of data points with unknown value). Most online retailers collect user interest and demographics on an opt-in basis, resulting in high missingness. The utility of these features can be improved by filling in missing information with an educated guess, e.g. through imputation or classification. For example, information that is commonly provided for shipping purposes, like name and location, could be used to infer other properties like gender, socioeconomic status, or age.
 
 ### Feature Selection
 
