@@ -1,16 +1,32 @@
 # Frequently Bought Together Product Suggestions
 
-## Motivation
+## Executive Summary
 
 Customers often purchase complementary products in a single order. Forgetting to include relevant accompaniments can leave other items temporarily inoperable or unenjoyable, decreasing satisfaction and necessitating a last-minute purchase of the missing items. Fortunately, relevant products can be suggested to customers based on their other intended purchases using co-occurence patterns learned from sales transaction data. These "frequently bought together" product suggestions drive both revenue and customer satisfaction.
 
 Unlike product recommendations based on long-term user characteristics like past purchases and demographics, "frequently bought together" suggestions are personalized using a user's very recent shopping behavior, viz., which items are currently in their shopping cart. (Historical user-specific features are less informative when predicting forgotten products in the current transaction.) Many online retailers display both types of product suggestions to consumers because they satisfy complementary goals.
 
-## Use Case
+## Example: Contoso Mart
 
-Joseph Mart is an online retailer that has noticed a disturbing recent trend in its electronics department. Over the holiday season, many customers found that they could not use toys/gadgets received as gifts because the manufacturer did not include batteries or a charger. While the product descriptions clearly indicated that these items were sold separately, dissatisfaction has driven negative reviews and product returns. Joseph, CEO of Joseph Mart, further suspects that sales of these accessory items are being lost to brick-and-mortar retailers as customers choose not to wait for a second shipment.
+Contoso Mart is an online retailer that has noticed a disturbing recent trend in its electronics department. Over the holiday season, many customers found that they could not use toys/gadgets received as gifts because the manufacturer did not include batteries or a charger. While the product descriptions clearly indicated that these items were sold separately, dissatisfaction has driven negative reviews and product returns. Connie, CEO of Contoso Mart, further suspects that sales of these accessory items are being lost to brick-and-mortar retailers as customers choose not to wait for a second shipment.
 
-Joseph hopes to recapture this revenue and improve the customer experience by including complementary-product suggestions in the "shopping cart" view of Joseph Mart. The sheer number of products and their rapid turnover prohibit manual curation: automatic detection of complementary products will be necessary.
+Connie hopes to recapture this revenue and improve the customer experience by including complementary-product suggestions in the "shopping cart" view of Contoso Mart. The sheer number of products and their rapid turnover prohibit manual curation: automatic detection of complementary products will be necessary.
+
+## Outline
+- [Data Acquisition](#Data-Acquisition)
+   - [Sales Transaction Data](#Sales-Transaction-Data)
+   - [Optional: Product and Transaction Descriptions](#Optional)
+- [Model Selection](#Model-Selection)
+   - [Item-to-Item Collaborative Filtering](#Item-to-Item-Collaborative-Filtering)
+   - [Association Rules](#Association-Rules)
+- [Best Practices for Model Training and Evaluation](#Best-Practices-for-Model-Training-and-Evaluation)
+   - [Evaluation Set Creation](#Evaluation-Set-Creation)
+   - [Hyperparameter Fitting](#Hyperparameter-Fitting)
+   - [Evaluation](#Evaluation)
+- [Operationalization and Deployment](#Operationalization-and-Deployment)
+   - [Creating Predictive Web Services from Trained Models](#Creating-Predictive-Web-Services-from-Trained-Models)
+   - [A/B Testing](#ab)
+   - [Model Retraining](#Model-Retraining)
 
 ## Data Acquisition
 
@@ -21,8 +37,8 @@ The relevant input data for this use case are transaction-level sales records fr
 
 When sales transaction data are not available in sufficient quantity, synthetic transactions reflecting expected purchase patterns may replace or augment historical records.
 
-### Sales Transaction Data Structure
-Like many online retailers, Joseph Mart stores its transactional data in a semi-structured format to accommodate the variability in number of products per transaction (among other advantages). Typical sales records resemble the following:
+### Sales Transaction Data
+Like many online retailers, Contoso Mart stores its transactional data in a semi-structured format to accommodate the variability in number of products per transaction (among other advantages). Typical sales records resemble the following:
 ```
 {
     "TransactionID": 123456789,
@@ -56,11 +72,11 @@ Like many online retailers, Joseph Mart stores its transactional data in a semi-
     ]
 }
 ```
-Like many retailers, Joseph Mart tracks its offerings in a hierarchical scheme of identifiers. The most specific descriptor for an item is its *stock keeping unit* identifier (`SKUID`), used for tracking inventory. The next level of organization, the product ID, is used to group together one or more SKUs that are qualitatively similar and always sold at the same price. For example, the different sizes of a certain t-shirt would share a product ID since customers expect to pay the same price for any size, but each size would have a unique SKUID so that its inventory can be managed independently. Retailers may further group products by product group, brand, or department.
+Like many retailers, Contoso Mart tracks its offerings in a hierarchical scheme of identifiers. The most specific descriptor for an item is its *stock keeping unit* identifier (`SKUID`), used for tracking inventory. The next level of organization, the product ID, is used to group together one or more SKUs that are qualitatively similar and always sold at the same price. For example, the different sizes of a certain t-shirt would share a product ID since customers expect to pay the same price for any size, but each size would have a unique SKUID so that its inventory can be managed independently. Retailers may further group products by product group, brand, or department.
 
-Understanding a retailer's identifier hierarchy is necessary to select a level at which to aggregate data and make recommendations. In Joseph Mart's case, it seems appropriate to make "frequently bought together" selections based on product IDs rather than SKUIDs. This choice offers two major benefits: (i) we will have increased power for accurate pattern detection because the number of observations per product ID is larger, and (ii) customers will receive a suggestion to purchase a product and can select their preferred SKU themselves.
+Understanding a retailer's identifier hierarchy is necessary to select a level at which to aggregate data and make recommendations. In Contoso Mart's case, it seems appropriate to make "frequently bought together" selections based on product IDs rather than SKUIDs. This choice offers two major benefits: (i) we will have increased power for accurate pattern detection because the number of observations per product ID is larger, and (ii) customers will receive a suggestion to purchase a product and can select their preferred SKU themselves.
 
-### Optional: Product and Transaction Descriptions
+### Optional: Product and Transaction Descriptions <a name="Optional"></a>
 
 As we will describe further in the Model Selection section below, new products pose a challenge to recommender systems because they have no/few training observations on which to learn purchase patterns. Some recommender models can use a supplied list of product details to identify current items that are similar to a new item; this information can be used to produce appropriate recommendations for the new item even before the first sale has occurred. Most retailers maintain a product catalog containing details such as brand, ontology (place within a product hierarchy, e.g. "baked goods, bread, pre-sliced loaves"), seasonality, etc. that can be used for this purpose. Sale transaction details like time of day, day of week, number of products, total price, etc. can also help identify similarities between transactions, potentially improving recommendations.
 
@@ -106,16 +122,16 @@ An association rule's utility is generally assessed by two metrics:
 
 Descriptions of additional association rule metrics can be found in the [Association Analysis chapter](http://www-users.cs.umn.edu/~kumar/dmbook/ch6.pdf) of [Introduction to Data Mining](http://www-users.cs.umn.edu/~kumar/dmbook/index.php) by Tan, Steinbach, and Kumar.
 
-When making personalized offers, one may be willing to tolerate relatively low confidence values. For example, if 20% of customers who buy ketchup also buy mustard, the rule \{ ketchup \} -> \{ \textrm{mustard} \} will be broken 80% of the time, but the purchasing trend is still strong enough to merit a recommendation. By contrast, a lower bound on support can help avoid a large number of "false positive" association rules that would cause confusion for users.
+When making personalized offers, one may be willing to tolerate relatively low confidence values. For example, if 20% of customers who buy ketchup also buy mustard, the rule \{ ketchup \} -> \{ mustard \} will be broken 80% of the time, but the purchasing trend is still strong enough to merit a recommendation. By contrast, a lower bound on support can help avoid a large number of "false positive" association rules that would cause confusion for users.
 
 Downsides of the association rule approach include:
 - Long runtimes may be required when the retailer's product catalog is large. (The rate of runtime growth with product number can be reduced by setting a maximum number of items that may be included in a single rule.)
 - Association rules should be recreated when new products are added: unlike hybrid recommenders, association rules cannot recommend new products on the basis of similarity to other products in the catalog.
 
-Association rule mining packages are available in R (e.g., [arules](https://cran.r-project.org/web/packages/arules/index.html)) and Python (e.g., [apriori](https://github.com/asaini/Apriori)). These packages typically require that the product identifiers in each transaction be provided in the form of a list: in Joseph Mart's case, this requires parsing each semi-structured sales transaction record to obtain a variable-length list of the products sold in the transaction.
+Association rule mining packages are available in R (e.g., [arules](https://cran.r-project.org/web/packages/arules/index.html)) and Python (e.g., [apriori](https://github.com/asaini/Apriori)). These packages typically require that the product identifiers in each transaction be provided in the form of a list: in Contoso Mart's case, this requires parsing each semi-structured sales transaction record to obtain a variable-length list of the products sold in the transaction.
 
 Exampls incorporating the `arules` package can be found in the Cortana Intelligence Gallery:
-- [Hai Ning's Assciation Rules](https://gallery.cortanaintelligence.com/CustomModule/Association-Rules-2): a code-free example including `arules` in a custom module
+- [Hai Ning's Association Rules](https://gallery.cortanaintelligence.com/CustomModule/Association-Rules-2): a code-free example including `arules` in a custom AML module
 - [Martin Machac's Frequently bought together - market basket analyses using ARULES](https://gallery.cortanaintelligence.com/Experiment/Frequently-bought-together-market-basket-analyses-using-ARULES-1): includes a custom R script to load and run the `arules` package from a Script Bundle
 
 ## Best Practices for Model Training and Evaluation
@@ -162,9 +178,9 @@ Once optimal hyperparameters have been identified and the model's performance ha
 **Association Rules**
 Once the final ruleset has been identified by performing association rule mining on all available data, a predictive experiment should be created to identify applicable rules for an input shopping cart and provide as output any suggested products that are not already in the cart.
 
-After the web service has been deployed and tested, the online retailer's website can be modified to call the web service and include responses in the web pages it displays. Many retailer websites are created using common programming languages that support calling and parsing responses from web services. Joseph Mart's website was created on [Azure Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/), which supports many programming languages, including Node.js, Python, PHP, .NET, and Java. Joseph Mart adapts the web service's sample code snippet so that their web app will request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page.
+After the web service has been deployed and tested, the online retailer's website can be modified to call the web service and include responses in the web pages it displays. Many retailer websites are created using common programming languages that support calling and parsing responses from web services. Contoso Mart's website was created on [Azure Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/), which supports many programming languages, including Node.js, Python, PHP, .NET, and Java. Contoso Mart adapts the web service's sample code snippet so that their web app will request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page.
 
-### A/B Testing
+### A/B Testing <a name="ab"></a>
 
 Before providing a new or upgraded feature to all customers, some online retailers prefer to expose the feature to a subset of users for a trial period. This gradual roll-out diminishes any disruptions that may be experienced as the load handling and real-world recommendation efficacy are first tested. This approach is often called *A/B testing*, since the clickthrough rates and revenue can be compared between the two groups of users that see different site versions. Many retailers randomly assign users to these groups, but when this approach is not properly explained to users, they may express concern or dismay that they do not experience the website in the same way. Some online retailers therefore establish opt-in programs where participants are informed that they may experience features before general availability.
 
