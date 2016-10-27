@@ -171,25 +171,25 @@ After the test set has been scored using the trained model, the predicted and ac
 
 **Overall and average accuracy**
 
-The *overall accuracy* is the fraction of data points where the predicted and actual labels match. For a test dataset $X$ with predicted labels $Y$, let $X_{\ell}$ denote the set of points with true label $\ell$, and $F_{\ell}$ denote the set of points with predicted label $\ell$. We can then express the overall accuracy using a sum over the $n$ labels:
+The *overall accuracy* is the fraction of data points where the predicted and actual labels match. For a test dataset *X* with predicted labels *Y*, let *X<sub>l</sub>* denote the set of points with true label *l*, and *F<sub>l</sub>* denote the set of points with predicted label *l*. We can then express the overall accuracy using a sum over the *n* labels:
 
-$$ \mathcal{A}_{\textrm{overall}} = \frac{\sum_{\ell = 1}^n |X_{\ell} \cap Y_{\ell}|}{\left|X\right|} $$
+<p align="center"><img alt="Overall accuracy" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/overall_accuracy.PNG?raw=true"></p>
 
-where $|X|$ denotes the size of set $X$. 
+where *|X|* denotes the size of set *X*. 
 
 An alternative metric is defined in terms of the class-specific accuracies, i.e., the fraction of all data points that are correctly labeled as belonging or not belonging to each class:
 
-$$ \mathcal{A}_{\ell} = \frac{\left|X_{\ell} \cap Y_{\ell}\right| + \left| \, (X \setminus X_{\ell}) \cap (Y \setminus Y_{\ell}) \, \right|}{\left|X\right|}, \hspace{0.5 cm} \ell = 1, 2, \ldots, n$$
+<p align="center"><img alt="Class-specific accuracy" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/class_specific_accuracy.PNG?raw=true"></p>
 
 The *average accuracy* is the unweighted average of the class-specific accuracies:
 
-$$ \mathcal{A}_{\textrm{average}} = \frac{1}{n} \sum_{\ell=1}^n \mathcal{A}_{\ell}$$
+<p align="center"><img alt="Average Accuracy" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/average_accuracy.PNG?raw=true"></p>
 
 When predictions on a minority class are substantially worse than other predictions -- which may be caused by the small number of training points available -- the average accuracy will be more deeply impacted than the overall accuracy.
 
 **Confusion matrix**
 
-The confusion matrix $\mathcal{C}$ summaries the number of data points in the test set with each combination of true and predicted labels. Each element $c_{\ell m}$ of the confusion matrix is number of data points with true label $\ell$ that were predicted to have label $m$.
+The confusion matrix *C* summaries the number of data points in the test set with each combination of true and predicted labels. Each element *C<sub>lm</sub>* of the confusion matrix is number of data points with true label *l* that were predicted to have label *m*.
 
 As an example, for the following simple dataset and labels:
 
@@ -213,29 +213,29 @@ A perfect predictor would produce a diagonal confusion matrix; any non-zero off-
 
 **Recall**
 
-The model's recall for a class $\ell$ is the fraction of data points in $X_{\ell}$ that were predicted to be in class $\ell$:
+The model's recall for a class *l* is the fraction of data points in *X<sub>l</sub>* that were predicted to be in class *l*:
 
-$$ \mathcal{R}_{\ell} = \frac{|X_{\ell} \cap Y_{\ell}|}{|X_{\ell}|} $$
+<p align="center"><img alt="Class-specific Recall" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/class_specific_recall.PNG?raw=true"></p>
 
 There are two common methods for summarizing recall across all classes. The *macro-averaged* recall is the (unweighted) average class recall:
 
-$$ \mathcal{R}_{\textrm{macro-avg}} = \frac{1}{n} \sum_{\ell=1}^{n} \mathcal{R}_{\ell} $$
+<p align="center"><img alt="Macro-averaged Recall" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/macro_average_recall.PNG?raw=true"></p>
 
 The *micro-averaged recall*, by contrast, is the a weighted average of the class recalls (with fraction of all datapoints in each class used as the weighting):
 
-$$ \mathcal{R}_{\textrm{micro-avg}} = \sum_{\ell=1}^{n} \frac{|X_{\ell}| \mathcal{R}_{\ell}}{|X|} $$
+<p align="center"><img alt="Micro-averaged Recall" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/micro_average_recall.PNG?raw=true"></p>
 
 The micro- and macro-averaged recall are identical for balanced datasets. In imbalanced datasets, poor recall on a minority class has a more dramatic effect on macro- than micro-averaged recall.
 
 **Precision**
 
-The model's precision for a class $\ell$ is the fraction of data points predicted to be in class $\ell$ that are truly in class $\ell$:
+The model's precision for a class *l* is the fraction of data points predicted to be in class *l* that are truly in class *l*:
 
-$$ \mathcal{P}_{\ell} = \frac{|X_{\ell} \cap Y_{\ell}|}{|Y_{\ell}|} $$
+<p align="center"><img alt="Class-specific Precision" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/class_specific_precision.PNG?raw=true"></p>
 
 As with recall, precision for multiclass classifiers can be calculated using micro- or macro-averaging:
 
-$$ \mathcal{P}_{\textrm{macro-avg}} = \frac{1}{n} \sum_{\ell=1}^{n} \mathcal{P}_{\ell}, \hspace{1 cm}  \mathcal{P}_{\textrm{micro-avg}} = \sum_{\ell=1}^{n} \frac{|Y_{\ell}| \mathcal{P}_{\ell}}{|Y|} $$
+<p align="center"><img alt="Average Precision" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/average_precision.PNG?raw=true"></p>
 
 For additional description of these and other metrics, see [Computing Classification Evaluation Metrics in R](http://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html) by Said Bleik.
 
@@ -243,13 +243,11 @@ For additional description of these and other metrics, see [Computing Classifica
 
 Contoso Mart uses Azure Machine Learning Studio to train and evaluate its classifier:
 
-![Training Experiment Graph](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/predictive_experiment_graph.PNG?raw=true)
+<p align="center"><img alt="Training Experiment Graph" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/predictive_experiment_graph.PNG?raw=true"></p>
 
 The metrics and confusion matrix described above are automatically generated by the Evaluate Model module, and can be inspected by right-clicking on the module's output port to select the visualization option.
 
-![Evaluate Model Module Results - Metrics](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/evaluate_model_metrics.PNG?raw=true)
-
-![Evaluate Model Module Results - Confusion Matrix](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/evaluate_model_confusion_matrix.png?raw=true)
+<p align="center"><img alt="Evaluate Model Module Results - Metrics" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/evaluate_model_metrics.PNG?raw=true"><img alt="Evaluate Model Module Results - Confusion Matrix" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/evaluate_model_confusion_matrix.png?raw=true"></p>
 
 If desired, Contoso Mart could also calculate arbitrary metrics of interest using Python and R scripts they create or find online.
 
@@ -277,7 +275,7 @@ The multiclass classifier should be retrained as the selection of available offe
 
 Contoso Mart uses one-click deployment to create a predictive web service based on their trained model:
 
-![Predictive Experiment Graph](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/predictive_experiment_graph.PNG?raw=true)
+<p align="center"><img alt="Predictive Experiment Graph" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/predictive_experiment_graph.PNG?raw=true"></p>
 
 Each time a user requests to load a web page, Contoso Mart's web app calls the predicted AML web service to request a recommendation. The web service returns the identifier for a personalized offer, which is used during page rendering to add the offer's image and hyperlink to a page template. To monitor the personalized offers' efficacy, Contoso Mart continues to record all clickthrough events to Azure Blob Storage, from which they are regularly transferred to SQL Data Warehouse for long-term storage, analysis, and display via a Power BI dashboard.
 
