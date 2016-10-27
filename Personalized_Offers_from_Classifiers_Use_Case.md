@@ -6,7 +6,7 @@ To help their customers find relevant products and offers on large websites, man
 
 ## Background on Example Retailer: Contoso Mart
 
-Contoso Mart is a fictitious online retailer that has approved a selection of 25 offers for all users. After experimenting with methods to highlight these offers, Contoso Mart has found that users prefer to see only one offer displayed on a web page at a time. Contoso Mart hopes to improve the offer clickthrough rate by displaying the offer deemed most appealing for each user based on both recent and longterm browsing history. Since the offers are relatively consistent with time and few in number, Contoso Mart's records on user interactions with each offer are dense and well-suited for training a multiclass classifier. Contoso Mart's development experience will be highlighted in each section of this use case.
+Contoso Mart is a fictitious online retailer that has approved a selection of 25 offers for all users. After experimenting with methods to highlight these offers, Contoso Mart has found that users prefer to see only one offer displayed on a web page at a time. Contoso Mart hopes to improve the offer clickthrough rate by displaying the offer deemed most appealing for each user based on both recent and longterm browsing history. Since the offers are relatively consistent with time and few in number, Contoso Mart's records on user interactions with each offer are dense and well-suited for training a multiclass classifier. Contoso Mart's personalized offer development experience will be highlighted in each section of this use case.
 
 ## Outline
 - [Data Acquisition](#Data-Acquisition)
@@ -37,17 +37,17 @@ Contoso Mart is a fictitious online retailer that has approved a selection of 25
 
 ### User Behaviors
 
-** Offer Clickthroughs **
+**Offer Clickthroughs**
 
-A user's response provides the most direct feedback on their interest in an offer. In the most common data collection scheme, a retailer records each offer displayed to a user and each offer that is clicked: the ignored vs. clicked offers can then be tallied in post-processing. For technical simplicity, some retailers choose to record only clickthrough events.
+A user's response provides the most direct feedback on their interest in an offer. In the most common data collection scheme, a retailer records each offer displayed to a user and each time an offer is clicked: these records can be compared later, using timestamps or unique URIs, to determine which offers were ignored. For technical simplicity, some retailers choose to record only clickthrough events.
 
 Note that offer clickthrough data can only be collected after offers start being displayed on the retailer's website. A retailer can begin collecting data by displaying a randomly-selected offer, perhaps with a specified bias based on the user's demographic information or profile. If the distribution of offers displayed to each user is non-random, downsampling (or upsampling) may be used to balance the dataset.
 
-** Page Views **
+**Page Views**
 
 A user's browsing history may shed light on either longterm preferences or current purchase intentions, depending on the timescale of interest. Each visit to a given page adds evidence of a user's interest in the page's contents, which may correspond to interest in a related offer. A rolling tally of a user's views for each page can be maintained over any time frame of interest, with current values recorded at the time a clickthrough event is logged. Alternatively, each page view can be recorded directly in a log entry containing a timestamp and identifiers for the user and page.
 
-** Purchases, Product Reviews, and Wishlists **
+**Purchases, Product Reviews, and Wishlists**
 
 Interest in some offers -- in particular, product recommendations -- is highly likely to correlate with interest in specific products. In these cases, it is informative to record users' purchases, reviews, and "wishlist" contents, which can give strong indications of a user's interest in specific products. Some consideration should be given to the interpretation and relative weighting of these indicators. For example, even a highly negative review suggests that the user purchased the product in the first place: the user's interest level in the product is therefore likely to be higher than a product the user did not review or purchase at all.
 
@@ -70,13 +70,13 @@ The core component of the model training/evaluation datasets is the offer clickt
 
 ### Feature Extraction
 
-** Rolling windows **
+**Rolling windows**
 
 Raw event logs typically include information on only one event per row. By applying rolling window techniques to these logs, we can create new features that count, for each timepoint in the log, the number of events which occurred in the last *n* minutes. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate each clickthrough data point with the most recent event counts. This technique can be used to create potentially-useful features such as "number of visits to page x in last hour".
 
 Data scientists who introduce rolling counts during feature extraction must give careful thought to how these features will be computed after the model is deployed: the calculations which they perform to construct these features during offline model development may not be ideal in the time-sensitive context of the operationalized model. Data engineers and solution architects can help design a solution for near-real time calculation of these rolling counts, so that they can be provided as inputs for the trained model. If this solution is expected to have a processing delay for rolling count maintenance, that delay should be simulated during offline feature creation. (Once the solution is operational, these rolling counts should be stored with each offer clickthrough data point, rather than generated offline through feature extraction, to most accurately reflect any processing delays.)
 
-** Inferred User Descriptors **
+**Inferred User Descriptors**
 
 User descriptors are most useful when they have low "missingness" (fraction of data points with unknown value), but most online retailers collect this information on an opt-in basis. The utility of these features can be improved by filling in missing information with an educated guess, e.g. through imputation or classification. For example, information that is commonly provided for shipping purposes, like name and location, could be used to infer other properties like gender, socioeconomic status, or age.
 
@@ -120,11 +120,11 @@ For a detailed comparison of several classifier models, please see our [broader 
 
 Multiclass classifiers can be constructed from sets of binary classifiers in two common ways:
 
-** One vs. One**
+**One vs. One**
 
 Under this scheme, an $n$-class classifier is constructed from $\binom{n}{2} = n(n-1)/2$ binary classifiers. Each binary classifier $f_{ij}: X \to \{ i, j \}$ is trained using the subset of training data points with label $i$ or $j$. The label assigned by the multiclass classifier is the most common label assigned by the set of binary classifiers. Disadvantages of this scheme include the fast growth in number of required classifiers with $n$, and the potential ambiguity when the same number of classifiers support 2 or more most common labels.
 
-** One vs. All **
+**One vs. All**
 
 An $n$-class classifier can also be constructed from $n$ binary classifiers, provided that the classifier returns a score indicating confidence (in addition to an assigned label) for each data point. Each classifier $f_{\ell}: X \to \mathbb{R}$ is trained to return a value indicating its confidence that a data point $\mathbb{x}$ has label $\ell$. Data points are assigned the label corresponding to the most confident classifier, i.e. $f(\mathbf{x}) = \arg\max_{\ell} f_{\ell}(\mathbf{x})$. A disadvantage of this approach is that it requires a classifier type that can assure similarly-scaled confidence scores and increase the probability that classifiers will be trained on imbalanced datasets.
 
@@ -166,7 +166,7 @@ Some classification models take hyperparameters that tune properties such as str
 
 After the test set has been scored using the trained model, the predicted and actual data point labels can be compared using a variety of metrics:
 
-** Overall and average accuracy**
+**Overall and average accuracy**
 
 The *overall accuracy* is the fraction of data points where the predicted and actual labels match. For a test dataset $X$ with predicted labels $Y$, let $X_{\ell}$ denote the set of points with true label $\ell$, and $F_{\ell}$ denote the set of points with predicted label $\ell$. We can then express the overall accuracy using a sum over the $n$ labels:
 
@@ -184,7 +184,7 @@ $$ \mathcal{A}_{\textrm{average}} = \frac{1}{n} \sum_{\ell=1}^n \mathcal{A}_{\el
 
 When predictions on a minority class are substantially worse than other predictions -- which may be caused by the small number of training points available -- the average accuracy will be more deeply impacted than the overall accuracy.
 
-** Confusion matrix **
+**Confusion matrix**
 
 The confusion matrix $\mathcal{C}$ summaries the number of data points in the test set with each combination of true and predicted labels. Each element $c_{\ell m}$ of the confusion matrix is number of data points with true label $\ell$ that were predicted to have label $m$.
 
@@ -208,7 +208,7 @@ The corresponding confusion matrix would be:
 
 A perfect predictor would produce a diagonal confusion matrix; any non-zero off-diagonal elements correspond to prediction errors. Confusion matrices can be visually inspected or summarized further using metrics like precision and recall.
 
-** Recall **
+**Recall**
 
 The model's recall for a class $\ell$ is the fraction of data points in $X_{\ell}$ that were predicted to be in class $\ell$:
 
@@ -224,7 +224,7 @@ $$ \mathcal{R}_{\textrm{micro-avg}} = \sum_{\ell=1}^{n} \frac{|X_{\ell}| \mathca
 
 The micro- and macro-averaged recall are identical for balanced datasets. In imbalanced datasets, poor recall on a minority class has a more dramatic effect on macro- than micro-averaged recall.
 
-** Precision **
+**Precision**
 
 The model's precision for a class $\ell$ is the fraction of data points predicted to be in class $\ell$ that are truly in class $\ell$:
 
@@ -266,3 +266,5 @@ The multiclass classifier should be retrained as the selection of available offe
 ### Example: Contoso Mart  <a name="odcm"></a>
 
 Each time a user requests to load a web page, Contoso Mart's web app calls the predicted AML web service to request a recommendation. The web service returns the identifier for a personalized offer, which is used during page rendering to add the offer's image and hyperlink to a page template. To monitor the personalized offers' efficacy, Contoso Mart continues to record all clickthrough events to Azure Blob Storage, from which they are regularly transferred to SQL Data Warehouse for long-term storage, analysis, and display via a Power BI dashboard.
+
+![Image of Contoso Mart's Solution Architecture](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/architecturediagram.jpg)
