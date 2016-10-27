@@ -85,7 +85,7 @@ User descriptors are most useful when they have low "missingness" (fraction of d
 
 ### Feature Selection
 
-During the feature extraction stage, a large number of features may be created from the available data. For example, when employing page view data, we may create a separate feature for rolling counts of page views for each page, for each of multiple time windows. Some of these features will not be correlated to the label of interest (the identifier of the clicked offer) or otherwise not contribute to a model's predictive power. Such features should be removed during the feature selection stage to reduce training time and the potential for model overfitting. Retained features can be selected using correlation or mutual information with the label, forward selection or backward elimination, and a variety of other specialized approaches that may be model-specific (e.g. feature importance for decision forests).
+During the feature extraction stage, a large number of features may be created from the available data. For example, when employing page view data, we may create a separate feature for rolling counts of page views for each page, in each of multiple time windows. Some of these features will not be correlated to the label of interest (the identifier of the clicked offer) or even detract from a model's predictive power through overfitting. Such features should be removed during the feature selection stage to reduce training time and the potential for model overfitting. The features to retain can be selected using correlation or mutual information with the label, forward selection or backward elimination, and a variety of model-specific approaches (e.g. feature importance for decision forests).
 
 ### Example: Contoso Mart <a name="fescm"></a>
 
@@ -100,13 +100,13 @@ Major advantages of classifiers over alternatives like hybrid recommendation mod
 ### Model Types
 
 Common types of classifier models include:
-- k-Nearest Neighbors
-- Logistic Regression
-- Naive Bayes
-- Kernel Machines (e.g. Support Vector Machines, Bayes Point Machines)
-- Decision Forest
-- Decision Jungle
-- Neural Network
+- [k-Nearest Neighbors](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm)
+- [Logistic Regression](https://en.wikipedia.org/wiki/Logistic_regression)
+- [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
+- [Kernel Machines (e.g. Support Vector Machines, Bayes Point Machines)](https://en.wikipedia.org/wiki/Kernel_method)
+- [Random (Decision) Forest](https://en.wikipedia.org/wiki/Random_forest)
+- [Decision Jungle](https://www.microsoft.com/en-us/research/publication/decision-jungles-compact-and-rich-models-for-classification/)
+- [Neural Network](https://en.wikipedia.org/wiki/Artificial_neural_network)
 
 A number of characteristics should be considered when selecting a classification model:
 - Accuracy of the predictions
@@ -114,8 +114,8 @@ A number of characteristics should be considered when selecting a classification
 - Training and scoring resource requirements
 - Availability of confidence metrics for predictions
 - Availability of methods for assessing feature importance
-- Avalability of regularization (can reduce overfitting)
-- Ability to succinctly explain prediction results
+- Avalability of model-specific methods to reduce overfitting
+- Ability to succinctly explain results
 
 For a detailed comparison of several classifier models, please see our [broader discussion of algorithm selection](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-algorithm-choice/) or Martin Thoma's blog post on [Comparing Classifiers](https://martin-thoma.com/comparing-classifiers/).
 
