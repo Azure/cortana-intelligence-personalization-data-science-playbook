@@ -125,11 +125,11 @@ Multiclass classifiers can be constructed from sets of binary classifiers in two
 
 **One vs. One**
 
-Under this scheme, an $n$-class classifier is constructed from $\binom{n}{2} = n(n-1)/2$ binary classifiers. Each binary classifier $f_{ij}: X \to \{ i, j \}$ is trained using the subset of training data points with label $i$ or $j$. The label assigned by the multiclass classifier is the most common label assigned by the set of binary classifiers. Disadvantages of this scheme include the fast growth in number of required classifiers with $n$, and the potential ambiguity when the same number of classifiers support 2 or more most common labels.
+Under this scheme, an *n*-class classifier is constructed from *n*-choose-2 = *n(n-1)/2* binary classifiers. Each binary classifier *f<sub>ij</sub>: X -> \{ i, j \}* is trained using the subset of training data points with label *i* or *j*. The label assigned by the multiclass classifier is the most common label assigned by the set of binary classifiers. Disadvantages of this scheme include the quadratic growth in number of required classifiers with *n*, and the potential ambiguity when the same number of classifiers support 2 or more most common labels.
 
 **One vs. All**
 
-An $n$-class classifier can also be constructed from $n$ binary classifiers, provided that the classifier returns a score indicating confidence (in addition to an assigned label) for each data point. Each classifier $f_{\ell}: X \to \mathbb{R}$ is trained to return a value indicating its confidence that a data point $\mathbb{x}$ has label $\ell$. Data points are assigned the label corresponding to the most confident classifier, i.e. $f(\mathbf{x}) = \arg\max_{\ell} f_{\ell}(\mathbf{x})$. A disadvantage of this approach is that it requires a classifier type that can assure similarly-scaled confidence scores and increase the probability that classifiers will be trained on imbalanced datasets.
+An *n*-class classifier can also be constructed from *n* binary classifiers, provided that the classifier returns a score indicating confidence (in addition to an assigned label) for each data point. Each classifier *f<sub>l</sub>: X -> __R__* is trained to return a value indicating its confidence that a data point *__x__* has label *l*. Data points are assigned the label corresponding to the most confident classifier, i.e. *f(__x__) = \arg\max<sub>l</sub> f<sub>l</sub>(__x__)*. A disadvantage of this approach is that it requires a classifier type that can assure similarly-scaled confidence scores and increase the probability that classifiers will be trained on imbalanced datasets.
 
 Some binary classifier models have also been extended (with model-specific algorithms) to allow efficient training and scoring without explicitly constructing binary classifiers as described above.
 
@@ -146,7 +146,7 @@ Contoso Mart chose to implement their classifier model using Azure Machine Learn
 Contoso Mart selected a multiclass logistic regression model based on the following desired features:
 - Fast training and scoring
 - Low resource requirements
-- Availability of $\ell_1$ and $\ell_2$ regularization
+- Availability of *l<sub>1</sub>* and *l<sub>2</sub>* regularization
 - Explainable results
 
 This type of multiclass classifier is one of many available as a built-in module in AML. If Contoso Mart had preferred, they could have created a multiclass model from any available binary classifier module using the [One-vs-All Multiclass module](https://msdn.microsoft.com/en-us/library/azure/dn905887.aspx), selecting a user-contributed [custom module](https://gallery.cortanaintelligence.com/customModules) available in the Cortana Intelligence Gallery, or scripting their own using R or Python.
