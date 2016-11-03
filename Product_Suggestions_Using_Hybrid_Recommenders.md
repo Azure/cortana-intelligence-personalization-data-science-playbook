@@ -167,8 +167,9 @@ During the training phase, the retailer may specify:
 The Matchbox Recommender can be used to predict affinties of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). The responsibility of combining all known behaviors for each user-product pair into a single affinity score lies with the retailer. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
 
 Examples of recommender systems built with the Matchbox Recommender can be examined and deployed from the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com) with a free account:
-- [An example of personalized restaurant suggestions based on customer reviews](https://gallery.cortanaintelligence.com/Tutorial/8-Recommendation-System-1)
-- [An example of movie recommendations based on viewer ratings](https://gallery.cortanaintelligence.com/Experiment/Recommender-Movie-recommendation-3)
+- [Product Recommendations via Hybrid Recommender](http://gallery.cortanaintelligence.com/Experiment/Product-Recommendations-via-Hybrid-Recommender-1) 
+- [Personalized restaurant suggestions based on customer reviews](https://gallery.cortanaintelligence.com/Tutorial/8-Recommendation-System-1)
+- [Movie recommendations based on viewer ratings](https://gallery.cortanaintelligence.com/Experiment/Recommender-Movie-recommendation-3)
 
 ### Recommendations API
 
