@@ -103,6 +103,7 @@ Hybrid methods that combine collaborative filtering with content-based filtering
 Several options for training and deploying collaborative filtering models are available on Azure:
 
 [Azure Machine Learning Studio](https://studio.azureml.net/), a graphical development environment for analytics and web service design, includes a collaborative filtering model called a **[Matchbox Recommender](https://www.microsoft.com/en-us/research/publication/matchbox-large-scale-bayesian-recommendations/)**. Matchbox Recommenders can provide item-to-item recommendations and may incorporate content-based filtering if desired. As of this writing, the Azure Machine Learning Studio environment is limited to 10 GB of data storage. Examples of recommender systems built with the Matchbox Recommender can be examined and deployed from the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com) with a free account:
+-[An example of frequently bought together product suggestions applied to incomplete shopping carts](http://gallery.cortanaintelligence.com/Experiment/Frequently-Bought-Together-Product-Suggestions-via-Item-to-Item-Collaborative-Filtering-1)
 - [An example of personalized restaurant suggestions based on customer reviews](https://gallery.cortanaintelligence.com/Tutorial/8-Recommendation-System-1)
 - [An example of movie recommendations based on viewer ratings](https://gallery.cortanaintelligence.com/Experiment/Recommender-Movie-recommendation-3)
 
