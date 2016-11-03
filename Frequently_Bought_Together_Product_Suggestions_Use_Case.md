@@ -131,7 +131,8 @@ Downsides of the association rule approach include:
 Association rule mining packages are available in R (e.g., [arules](https://cran.r-project.org/web/packages/arules/index.html)) and Python (e.g., [apriori](https://github.com/asaini/Apriori)). These packages typically require that the product identifiers in each transaction be provided in the form of a list: in Contoso Mart's case, this requires parsing each semi-structured sales transaction record to obtain a variable-length list of the products sold in the transaction.
 
 Exampls incorporating the `arules` package can be found in the Cortana Intelligence Gallery:
-- [Hai Ning's Association Rules](https://gallery.cortanaintelligence.com/CustomModule/Association-Rules-2): a code-free example including `arules` in a custom AML module
+- [Frequently Bought Together Product Suggestions via Association Rule Mining](http://gallery.cortanaintelligence.com/Experiment/Frequently-Bought-Together-Product-Suggestions-via-Association-Rule-Mining-1): simulated sales transaction data are mined for association rules, which in turn are used to generate product suggestions for incomplete shopping carts
+- [Hai Ning's Association Rules](https://gallery.cortanaintelligence.com/CustomModule/Association-Rules-2): a code-free example introducing the Discover Association Rules custom AML module
 - [Martin Machac's Frequently bought together - market basket analyses using ARULES](https://gallery.cortanaintelligence.com/Experiment/Frequently-bought-together-market-basket-analyses-using-ARULES-1): includes a custom R script to load and run the `arules` package from a Script Bundle
 
 ## Best Practices for Model Training and Evaluation
