@@ -105,6 +105,8 @@ Several options for training and deploying collaborative filtering models are av
 - [An example of personalized restaurant suggestions based on customer reviews](https://gallery.cortanaintelligence.com/Tutorial/8-Recommendation-System-1)
 - [An example of movie recommendations based on viewer ratings](https://gallery.cortanaintelligence.com/Experiment/Recommender-Movie-recommendation-3)
 
+<p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/frequently_bought_together/screenshots/item_to_item_experiment_graph.PNG?raw=true"></p>
+
 The **[Recommendation API](https://www.microsoft.com/cognitive-services/en-us/recommendations/documentation)** is a [Microsoft Cognitive Service](https://www.microsoft.com/cognitive-services) API that can be used to remotely train and store a collaborative filtering model (with or without content-based filtering). While some coding experience is required to interact with the API, it offers increased flexibility including the ability to operate on larger datasets and to set rules about which products should be actively promoted or not recommended. The [JJ Foods Inc. customer case study](https://customers.microsoft.com/en-US/story/food-delivery-service-uses-machine-learning-to-revolut) describes an application the Recommendations API to generate Frequently Bought Together recommendations.
 
 Custom code implementing other forms of collaborative filtering or hybrid recommenders may also be trained or operationalized on Azure, e.g. using [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/) or [Azure Machine Learning Studio](https://studio.azureml.net/).
@@ -134,6 +136,8 @@ Exampls incorporating the `arules` package can be found in the Cortana Intellige
 - [Hai Ning's Association Rules](https://gallery.cortanaintelligence.com/CustomModule/Association-Rules-2): a code-free example introducing the Discover Association Rules custom AML module
 - [Martin Machac's Frequently bought together - market basket analyses using ARULES](https://gallery.cortanaintelligence.com/Experiment/Frequently-bought-together-market-basket-analyses-using-ARULES-1): includes a custom R script to load and run the `arules` package from a Script Bundle
 
+<p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/frequently_bought_together/screenshots/association_rules_experiment_graph.PNG?raw=true"></p>
+
 ## Best Practices for Model Training and Evaluation
 
 ### Evaluation Set Creation
@@ -151,10 +155,14 @@ It is common practice to reserve a fraction of the training set (either statical
 - the number of training rounds (a larger number may give more accurate results but take longer to train)
 - the number of batches over which to perform training (influences training time)
 
-The common hyperparameters used in **association rules** algorithms are:
+<p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_train_module.PNG?raw=true"></p>
+
+Among the common hyperparameters used in **association rules** algorithms are:
 - minimum permissible support (low-support rules have little evidence and are more likely to be spurious)
 - minimum permissible confidence (low-confidence rules are more often broken, so represent weaker trends)
 - maximum item-set size (considering rules involving 3+ items will increase runtime)
+
+<p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/frequently_bought_together/screenshots/association_rules_custom_module_parameters.PNG?raw=true"></p>
 
 ### Evaluation
 
@@ -164,7 +172,7 @@ One method for evaluating a collaborative filtering (or hybrid recommender) mode
 
 **Association Rules**
 
-Association rule mining typically yields a collection of rules, each of which can be evaluated separately on the test set. For each rule, the support and confidence on the withheld data set is determined. Large deviations of these metrics from the values calculated on the training set may indicate that a change of hyperparameters is appropriate.
+Association rule mining typically yields a collection of rules, each of which can be evaluated separately on the test set. For each rule, the support and confidence on the withheld data set is determined. Large deviations of these metrics from the values calculated on the training set may indicate that a change of hyperparameters is appropriate. Alternatively, overall efficacy of recommendations can be calculated using the full association rule set by assessing how often the final item added to a user's shopping cart matches the recommendation based on its previous contents.
 
 ## Operationalization and Deployment
 
