@@ -160,9 +160,8 @@ The Azure ecosystem provides several options for implementing hybrid recommender
 
 [Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a graphical environment for analytics and web service production. AML Studio's built-in hyrid model, the [Matchbox Recommender](https://www.microsoft.com/en-us/research/publication/matchbox-large-scale-bayesian-recommendations/), can be trained and stored, used to create a web service that quickly generates product suggestions for a user of interest during page loading, and programmatically retrained on a scheduled basis. The Matchbox Recommender's major advantages over other methods discussed below include code-free implementation and avoidance of recommendations matching prior observations; as of this writing, however, the Matchbox Recommender is limited to 10 GB of training data.
 
-During the training phase, the retailer may specify:
-* the desired number of latent dimensions and training rounds to be used by the collaborative filtering model (hyperparameters that should be tuned using a validation step) as well as
-* the number of training batches over which to split the input data (ensuring that each batch of training data can fit into memory)
+<p align="center">
+<img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_graph.PNG?raw=true"></p>
 
 The Matchbox Recommender can be used to predict affinties of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). The responsibility of combining all known behaviors for each user-product pair into a single affinity score lies with the retailer. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
 
@@ -203,6 +202,8 @@ Accurate evaluation of a trained model's performance requires the use of fresh d
 
 Random splitting of observations into training and test sets may not be ideal for model evaluation. Contoso Mart hoped to be able to compare the performance on the model on brand new products/users vs. products and users who had many observations in the training set ("frequently-returning users"). This was made possible by ensuring that a substantial fraction of users/products were only observed in the test set. Models deployed in Azure Machine Learning Studio may use the Split Data module's Recommender Split mode to automate this form of partitioning.
 
+<p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_split_data_module.PNG?raw=true"></p>
+
 Another common method for observation partitioning is to divide observations chronologically. Unlike a random split, the chronologically-defined training set would not contain any observations that might unfairly "reveal" future trends during model training. This mimics the real-world scenario in which the model is trained on all data available on a certain date, then tested on new data as it arrives. Despite these potential advantages, Contoso Mart chose not to perform a chronological split because evaluating the model would require recalculating affinity scores as additional evidence (user behaviors like purchases and reviews) accumulated over time.
 
 ### Hyperparameter Selection
@@ -218,7 +219,12 @@ where *b* is a constant bias term, *c<sub>i</sub>* is the count of times that be
 
 **Latent Dimension and Training Round Count Parameters**
 
-Collaborative filtering models fit a representation for each user and product in a low-dimensional space. Both performance and runtime will generally rise with the number of latent dimensions and training rounds. After selecting an affinity score calculation method, Contoso Mart would like to examine the trade-off between performance and runtime to make an informed selection of parameters. Cross-validation is again used to test a small number of possible parameter combinations. The parameter combination which maximizes performance is used to train a model using the complete training data set.
+Many collaborative filtering models, including the Matchbox Recommender, fit a representation for each user and product in a low-dimensional space. Both performance and runtime will generally rise with the number of latent dimensions (sometimes referred to as "traits") and training rounds. It may also be necessary to perform training in batches to limit memory requirements.
+
+<p align="center">
+<img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_train_module.PNG?raw=true"></p>
+
+After selecting an affinity score calculation method, one may examine the trade-off between performance and runtime to make an informed selection of parameters. Cross-validation can be applied again to test a small number of possible parameter combinations. The parameter combination which maximizes performance is used to train a model using the complete training data set.
 
 ### Evaluation Metrics
 
