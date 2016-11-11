@@ -19,7 +19,7 @@ Contoso Mart is a fictitious online retailer with a catalog of ~100k products an
    - [User Description Augmentation](#User-Description-Augmentation)
 - [Hybrid Recommender Model Selection](#Hybrid-Recommender-Model-Selection)
    - [Matchbox Recommender in Azure Machine Learning Studio](#Matchbox-Recommender-in-Azure-Machine-Learning-Studio)
-   - [Recommendations API](#Recommendations-API)
+   - [Recommendations API](#api)
    - [Custom Implementation](#Custom-Implementation)
 - [Best Practices for Model Training and Evaluation](#Best-Practices-for-Model-Training-and-Evaluation)
    - [Evaluation Set Creation](#Evaluation-Set-Creation)
@@ -170,7 +170,7 @@ Examples of recommender systems built with the Matchbox Recommender can be exami
 - [Personalized restaurant suggestions based on customer reviews](https://gallery.cortanaintelligence.com/Tutorial/8-Recommendation-System-1)
 - [Movie recommendations based on viewer ratings](https://gallery.cortanaintelligence.com/Experiment/Recommender-Movie-recommendation-3)
 
-### Recommendations API
+### Recommendations API <a name="api"></a>
 
 The [Recommendations API](https://www.microsoft.com/cognitive-services/en-us/recommendations-api) is a [Microsoft Cognitive Service](https://www.microsoft.com/cognitive-services/en-us/apis) implementing a hybrid recommender model. Programs written in Python, Java, C#, and many other languages can interact with the API to upload data, train the hybrid recommender model, and quickly receive recommendations for a specific user. Scripts which interact with the Recommendations API can be incorporated directly into [Azure Web Apps](https://azure.microsoft.com/en-us/documentation/articles/app-service-web-overview/).
 
