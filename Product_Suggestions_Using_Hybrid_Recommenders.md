@@ -181,6 +181,9 @@ The Recommendations API offers several features not available in the Matchbox Re
 - Rules specifying items which should never appear in recommendations, and which items should be promoted, can be specified.
 - Products which a user has already purchased or viewed may still be recommended to the user.
 
+Examples illustrating the use of the Recommendations API can be found in the Cortana Intelligence Gallery:
+- [Product Recommendation in SalesForce using Microsoft Cognitive API](https://gallery.cortanaintelligence.com/Collection/Product-Recommendation-in-SalesForce-using-Microsoft-Cognitive-API-1)
+
 ### Custom Implementation
 
 Recommendation systems are under active research in machine learning. While many retailers employ Azure's out-of-the-box offerings, custom machine learning approach could be rapidly operationalized using [Azure Web Apps](https://azure.microsoft.com/en-us/documentation/articles/app-service-web-overview/) or [Azure Machine Learning Studio](https://studio.azureml.net/) if desired. These Azure services support common programming languages like Python, R, Java, and .NET, and allow the integration of open source packages for model training and scoring.
