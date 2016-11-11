@@ -188,6 +188,7 @@ The following case studies describe customers' experiences implementing product 
 - [Youbookx (includes comparison to Google Prediction API)](https://customers.microsoft.com/en-US/story/youboox-can-recommend-the-perfect-book-for-you-and-the)
 - [MEO](https://customers.microsoft.com/en-US/story/meocustomerstory)
 - [AllRecipes.com](http://advocacypublic.clouddam.microsoft.com/en-US/story/top-cooking-website-energizes-a-new-generation-of-cooks-with-personalized-recommendations)
+- [JJ Foods Inc.](https://customers.microsoft.com/en-US/story/food-delivery-service-uses-machine-learning-to-revolut)
 
 ### Custom Implementation
 
