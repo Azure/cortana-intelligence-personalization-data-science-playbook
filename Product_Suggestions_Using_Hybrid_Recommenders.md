@@ -236,7 +236,7 @@ In general, affinity score predictions on the test set will be more accurate for
 
 ### Creating and Consuming a Web Service
 
-The first step in operationalizing the hybrid recommender's product suggestions is the creation of a predictive web service. After creating an experiment in which data with the desired input and output schemas is scored using the trained model, a predictive web service can be deployed with a single click. The web service's functionality can be tested using sample code, a web interface, or an Excel plug-in.
+The first step in operationalizing the hybrid recommender's product suggestions is the creation of a predictive web service. Because Contoso Mart implemented their model in Azure Machine Learning Studio, they were able to generate the corresponding predictive web service with a single click. The web service's functionality can be tested using sample code, a web interface, or an Excel plug-in.
 
 Many retailer websites are created using common programming languages that support calling and parsing responses from web services. The web service's sample code snippet can be integrated into the existing website code to request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page. To reduce lag and ensure variability in recommendations, some retailers request multiple recommendations for each active user and store these for quick access during future page rendering.
 
