@@ -184,6 +184,11 @@ The Recommendations API offers several features not available in the Matchbox Re
 Examples illustrating the use of the Recommendations API can be found in the Cortana Intelligence Gallery:
 - [Product Recommendation in SalesForce using Microsoft Cognitive API](https://gallery.cortanaintelligence.com/Collection/Product-Recommendation-in-SalesForce-using-Microsoft-Cognitive-API-1)
 
+The following case studies describe customers' experiences implementing product suggestions using the Recommendations API:
+- [Youbookx (includes comparison to Google Prediction API)](https://customers.microsoft.com/en-US/story/youboox-can-recommend-the-perfect-book-for-you-and-the)
+- [MEO](https://customers.microsoft.com/en-US/story/meocustomerstory)
+- [AllRecipes.com](http://advocacypublic.clouddam.microsoft.com/en-US/story/top-cooking-website-energizes-a-new-generation-of-cooks-with-personalized-recommendations)
+
 ### Custom Implementation
 
 Recommendation systems are under active research in machine learning. While many retailers employ Azure's out-of-the-box offerings, custom machine learning approach could be rapidly operationalized using [Azure Web Apps](https://azure.microsoft.com/en-us/documentation/articles/app-service-web-overview/) or [Azure Machine Learning Studio](https://studio.azureml.net/) if desired. These Azure services support common programming languages like Python, R, Java, and .NET, and allow the integration of open source packages for model training and scoring.
