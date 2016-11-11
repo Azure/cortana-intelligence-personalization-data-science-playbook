@@ -181,7 +181,8 @@ The Recommendations API offers several features not available in the Matchbox Re
 - Rules specifying items which should never appear in recommendations, and which items should be promoted, can be specified.
 - Products which a user has already purchased or viewed may still be recommended to the user.
 
-Examples illustrating the use of the Recommendations API can be found in the Cortana Intelligence Gallery:
+The following examples illustrate the use of the Recommendations API:
+- [A sample recommender implementation in C#](https://code.msdn.microsoft.com/Recommendations-144df403)
 - [Product Recommendation in SalesForce using Microsoft Cognitive API](https://gallery.cortanaintelligence.com/Collection/Product-Recommendation-in-SalesForce-using-Microsoft-Cognitive-API-1)
 
 The following case studies describe customers' experiences implementing product suggestions using the Recommendations API:
