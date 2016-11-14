@@ -11,35 +11,36 @@ To help their customers navigate large websites, many online retailers highlight
 Contoso Mart is a fictitious online retailer that has approved a selection of 25 offers for all users. After experimenting with methods to highlight these offers, Contoso Mart has found that users prefer to see only one offer displayed on a web page at a time. Contoso Mart hopes to improve the offer clickthrough rate by displaying the offer deemed most appealing for each user based on the user's recent and longterm browsing history. Since the offers are relatively static and few in number, Contoso Mart's records on user interactions with each offer are dense and well-suited for training a multiclass classifier. Each stage of Contoso Mart's personalized offer development experience will be highlighted in the appropriate section of this document.
 
 ## Outline
-- [Data Acquisition](#Data-Acquisition)
-   - [User Behaviors](#User-Behaviors)
-   - [User Descriptors](#User-Descriptors)
+- [Data Acquisition](#dataacquisition)
+   - [User Behaviors](#behaviors)
+   - [User Descriptors](#descriptors)
    - [Example: Contoso Mart](#dacm)
-- [Feature Extraction and Selection](#Feature-Extraction-and-Selection)
-   - [Feature Extraction](#Feature-Extraction)
-   - [Feature Selection](#Feature-Selection)
+- [Feature Extraction and Selection](#extractionselection)
+   - [Feature Extraction](#extraction)
+   - [Feature Selection](#selection)
    - [Example: Contoso Mart](#fescm)
-- [Multiclass Classifier Model Selection](#Multiclass-Classifier-Model-Selection)
-   - [Model Types](#Model-Types)
-   - [Construction from Binary Classifiers](#Construction-From-Binary-Classifiers)
-   - [Implementation](#Implementation)
+- [Multiclass Classifier Model Selection](#modelselection)
+   - [Model Types](#types)
+   - [Construction from Binary Classifiers](#construction)
+   - [Implementation](#implementation)
    - [Example: Contoso Mart](#mscm)
-- [Best Practices for Training and Evaluation](#Best-Practices-for-Training-and-Evaluation)
-   - [Dataset Partitioning](#Dataset-Partitioning)
-   - [Hyperparameter Selection](#Hyperparameter-Selection)
-   - [Evaluation Metrics for Multiclass Classifiers](#Evaluation-Metrics-for-Multiclass-Classifiers)
+- [Best Practices for Training and Evaluation](#bestpractices)
+   - [Dataset Partitioning](#partitioning)
+   - [Hyperparameter Selection](#hyperparameters)
+   - [Evaluation Metrics for Multiclass Classifiers](#evaluation)
    - [Example: Contoso Mart](#tecm)
 - [Operationalization and Deployment](#od)
-   - [Creating and Consuming a Web Service](#Creating-and-Consuming-a-Web-Service)
+   - [Creating and Consuming a Web Service](#webservice)
    - [A/B and Multiworld Testing](#ab)
-   - [Model Retraining](#Model-Retraining)
+   - [Model Retraining](#retraining)
    - [Example: Contoso Mart](#odcm)
 
-
+<a name="dataacquisition"></a>
 ## Data Acquisition
 
 The first stage in implementation of a classifier for personalized offer recommendations is the collection of data that will be used to train the model. In particular, personalization requires collection of user-specific information such as interests, demographics, and behaviors. The data collected must be sufficient to construct labels (the property of each data point that the classifier will predict) as well as informative features that can be used to predict the labels.
 
+<a name="behaviors"></a>
 ### User Behaviors
 
 **Offer Clickthroughs**
@@ -56,11 +57,13 @@ A user's browsing history may shed light on longterm preferences and current pur
 
 Interest in some types of offers -- in particular, product recommendations -- correlates with user interest in specific products. Records of users' purchases, reviews, and "wishlist" contents can be used to predict their interest in a product of interest. Raw data of this type is likely to be sparse: for example, the probability that a user will purchase/review/etc. any given product is low. However, dense features appropriate for training classifier models can be constructed by summing across all products in defined categories.
 
+<a name="descriptors"></a>
 ### User Descriptors
 
 Many online retailers request and store customer details that are likely to correlate with their interest in specific offers. For example, customers usually specify their location and gender-specific appellation when entering their shipping information during sign-up or check-out. Some retailers collect additional details like age and stated interests on an opt-in basis, encouraging broad participation by offering incentives. (Users may also volunteer this information once they are convinced that relevant offers will improve their browsing experience.) Additional information may be shared when users link social media accounts containing a user profile.
 
-### Data Acquisition Example: Contoso Mart <a name="dacm"></a>
+<a name="dacm"></a>
+### Data Acquisition Example: Contoso Mart
 
 Contoso Mart sells twenty-five products. Every time a user requests a web page, an advertisement for one of these products is included on the page. (In other words, the type of offer that Contoso Mart hopes to personalize is a product suggestion.) Before implementing personalized offers, Contoso Mart highlighted a randomly-selected offer and recorded the following information for each clickthrough event:
 - The product was highlighted in the offer (encoded using 25 one-hot variables)
@@ -69,10 +72,12 @@ Contoso Mart sells twenty-five products. Every time a user requests a web page, 
 
 The resulting dataset has 101 features. If the number of products/web pages were larger, it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
 
+<a name="extractionselection"></a>
 ## Feature Extraction and Selection
 
 The core component of the model training/evaluation datasets is the offer clickthrough data, which generally contains the label of interest (viz., the identifier for the ad that was clicked), the identifier for the user who clicked it, and a timestamp. The user identifier and timestamp can be used to join the dataset with semi-static user descriptions like demographic properties as well as the user's recent behavior at the time the clickthrough occurred. This process may produce a dataset that includes many features, some of which are uninformative or contribute to overfitting. Feature selection can be used to reduce the feature set while maintaining as much predictive power as possible.
 
+<a name="extraction"></a>
 ### Feature Extraction
 
 **Rolling windows**
@@ -85,20 +90,24 @@ Data scientists who introduce rolling counts during feature extraction must give
 
 User descriptors are most useful when they have low "missingness" (fraction of data points with unknown value). Most online retailers collect user interest and demographics on an opt-in basis, resulting in high missingness. The utility of these features can be improved by filling in missing information with an educated guess, e.g. through imputation or classification. For example, information that is commonly provided for shipping purposes, like name and location, could be used to infer other properties like gender, socioeconomic status, or age.
 
+<a name="selection"></a>
 ### Feature Selection
 
 During the feature extraction stage, a large number of features may be created from the available data. For example, when employing page view data, we may create a separate feature for rolling counts of page views for each page, in each of multiple time windows. Some of these features will not be correlated to the label of interest (the identifier of the clicked offer) or even detract from a model's predictive power through overfitting. Such features should be removed during the feature selection stage to reduce training time and the potential for model overfitting. The features to retain can be selected using correlation or mutual information with the label, forward selection or backward elimination, and a variety of model-specific approaches (e.g. feature importance for decision forests).
 
-### Example: Contoso Mart <a name="fescm"></a>
+<a name="fescm"></a>
+### Example: Contoso Mart
 
 Contoso Mart merges all features of interest into the offer clickthrough data during the logging step, ensuring that the model is trained only on features that will be readily available after deployment. Rolling counts of recent page views are maintained using Azure Stream Analytics and Azure Event Hub. Contoso Mart did not choose to include static user attributes (demographics, etc.) in their model, but if a table of user attributes had been available, it could simply be joined to the main dataset by the user identifier field.
 
+<a name="modelselection"></a>
 ## Multiclass Classifier Model Selection
 
 Binary classifiers assign one of two possible labels to a given data point based on the values of relevant features. Multiclass classifiers extend this concept, creating a model that assigns one of 3+ labels for each data point. In this use case, we use a multiclass classifier to assign a label indicating which of the possible offers should be displayed (because that offer is deemed most likely to result in a clickthrough event). 
 
 Major advantages of classifiers over alternatives like hybrid recommendation models include their potentially faster speed, lower resource requirements, and improved explainability. However, classifiers are challenged by the introduction of new classes and very large numbers of classes. (Hybrid recommendation models may be preferable in these cases: se the following example use case.)
 
+<a name="types"></a>
 ### Model Types
 
 Common types of classifier models include:
@@ -121,6 +130,7 @@ A number of characteristics should be considered when selecting a classification
 
 For a detailed comparison of several classifier models, please see our [broader discussion of algorithm selection](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-algorithm-choice/) or Martin Thoma's blog post on [Comparing Classifiers](https://martin-thoma.com/comparing-classifiers/).
 
+<a name="construction"></a>
 ### Construction from Binary Classifiers
 
 Multiclass classifiers can be constructed from sets of binary classifiers in two common ways:
@@ -135,13 +145,15 @@ An *n*-class classifier can also be constructed from *n* binary classifiers, pro
 
 Some binary classifier models have also been extended (with model-specific algorithms) to allow efficient training and scoring without explicitly constructing binary classifiers as described above.
 
+<a name="implementation"></a>
 ### Implementation
 
 [Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a cloud-based graphical environment for machine learning data preparation and model development. Many of the multiclass classifier models mentioned above can be incorporated into AML through a code-free drag-and-drop interface, but data scientists can also import R and Python code to implement custom models if they prefer (and share these examples within the community). During model development, intermediate results can be examined using automated summaries, or custom code and visualizations in Python/R Jupyter notebooks. AML also facilitates deployment of predictive web services from trained models.
 
 [Azure App Services](https://azure.microsoft.com/en-us/documentation/services/app-service/) is another option for the deployment of models trained locally. Data scientists can create predictive web services using a wide variety of programming languages and common tools like Flask, Django, and Bottle. The Web App Service can also be used for the construction of web pages that make use of the web service.
 
-### Example: Contoso Mart <a name="mscm"></a>
+<a name="mscm"></a>
+### Example: Contoso Mart
 
 Contoso Mart chose to implement their classifier model using Azure Machine Learning Studio. A shared experiment showing their model training, scoring, and evaluation process can be found in the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com/).
 
@@ -153,8 +165,10 @@ Contoso Mart selected a multiclass logistic regression model based on the follow
 
 This type of multiclass classifier is one of many available as a built-in module in AML. If Contoso Mart had preferred, they could have created a multiclass model from any available binary classifier module using the [One-vs-All Multiclass module](https://msdn.microsoft.com/en-us/library/azure/dn905887.aspx), selecting a user-contributed [custom module](https://gallery.cortanaintelligence.com/customModules) available in the Cortana Intelligence Gallery, or scripting their own using R or Python.
 
+<a name="bestpractices"></a>
 ## Best Practices for Model Training and Evaluation
 
+<a name="partitioning"></a>
 ### Dataset Partitioning
 
 It is common practice to partition the available data points into two sets: a *training set* used to select hyperparameters (if applicable) and train the model, and a *test set* for evaluating the trained model's accuracy. This practice improves the odds that a model's performance on the test set will accurately reflect its performance on future data.
@@ -163,10 +177,12 @@ Random splitting of observations into training and test sets may not be ideal fo
 
 Another common partitioning method is to divide observations chronologically: observations collected before a certain date would  form the training set, and all more recent observations would form the test set. This arrangement mimics the real-world scenario in which the model is trained on all data available on a certain date, then tested on new data as it arrives. The performance of the trained model on the test set is realistic in the sense that the model will have no knowledge of any trends that arise after the trainign date. (By contrast, if the data were partitioned randomly, a model would likely be trained using some data points from every time period, and therefore could "learn" all such trends.)
 
+<a name="hyperparameters"></a>
 ### Hyperparameter Selection
 
 Some classification models take hyperparameters that tune properties such as strength of regularization, learning rate, and number of training rounds. (For more information on which hyperparameters are available for a given classification model, see the documentation for the machine learning model implementation. Descriptions of classification models in AML Studio can be found [here](https://msdn.microsoft.com/en-us/library/dn905808.aspx).) A range of possible hyperparameter values can be tested to identify the values that produce models with optimal performance on a withheld portion of the training set (usually called a "validation" set), which may be statically-defined or varied via [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)). In AML Studio, the [Tune Model Hyperparameters](https://msdn.microsoft.com/en-us/library/azure/dn905810.aspx) module can be used to automate hyperparameter selection using cross-validation.
 
+<a name="evaluation"></a>
 ### Evaluation Metrics for Multiclass Classifiers
 
 After the test set has been scored using the trained model, the predicted and actual data point labels can be compared using a variety of metrics:
@@ -241,7 +257,8 @@ As with recall, precision for multiclass classifiers can be calculated using mic
 
 For additional description of these and other metrics, see [Computing Classification Evaluation Metrics in R](http://blog.revolutionanalytics.com/2016/03/com_class_eval_metrics_r.html) by Said Bleik.
 
-### Example: Contoso Mart <a name="tecm"></a>
+<a name="tecm"></a>
+### Example: Contoso Mart
 
 Contoso Mart uses Azure Machine Learning Studio to train and evaluate its classifier:
 
@@ -255,25 +272,30 @@ If desired, Contoso Mart could also calculate arbitrary metrics of interest usin
 
 For additional information on model evaluation in AML Studio, please see Gary Ericson's [How to evaluate model performance in Azure Machine Learning](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-evaluate-model-performance/)
 
-## Operationalization and Deployment <a name="od"></a>
+<a name="od"></a>
+## Operationalization and Deployment
 
+<a name="webservice"></a>
 ### Creating and Consuming a Web Service
 
 After evaluation reveals that a trained model is fit for operationalization, a web service can be created to surface its recommendations. Depending on how the web service is deployed, it may be necessary to explicitly define the web service's input and output schema, i.e., the input data format needed to call the web service, and the format of the results to be returned. In Azure Machine Learning Studio, a predictive web service can be created from a trained model with a single click and tested using a graphical interface, Excel plug-in, or automatically-generated sample code. Developers using Azure Web Apps can also use common web service creation tools like [Flask](https://azure.microsoft.com/en-us/documentation/articles/web-sites-python-create-deploy-flask-app/), [Bottle](https://azure.microsoft.com/en-us/documentation/articles/web-sites-python-create-deploy-bottle-app/), and [Django](https://azure.microsoft.com/en-us/documentation/articles/web-sites-python-create-deploy-django-app/).
 
 Many retailer websites can be modified to request a personalized offer recommendation from the web service during page loading; the recommended offer's image and link can then be incorporated into the webpage in time for rendering.
 
-### A/B and Multiworld Testing  <a name="ab"></a>
+<a name="ab"></a>
+### A/B and Multiworld Testing
 
 Since personalized offers often contribute significantly to revenue and are displayed prominently, online retailers may wish to gradually introduce a new recommendation model to ensure that performance and quality meet expectations. In the A/B testing scheme, the new model's suggestions can be served to a small subset of users while the previous model continues to be displayed to the majority. Offers provided to the two user groups can then be compared on metrics like loading speed, error rate, and clickthrough rate to ensure that the new model is equally reliable and offers superior product suggestions.
 
 [Multiworld Testing](https://www.microsoft.com/en-us/research/project/multi-world-testing-mwt/) is an extension of A/B testing that permits multiple models to be tested concurrently, with automated selection of effective models. The [Multiworld Decision Service](http://mwtds.azurewebsites.net/) simplifies the process of incorporating this form of testing into a web application.
 
+<a name="retraining"></a>
 ### Model Retraining
 
 The multiclass classifier should be retrained as the selection of available offers changes and additional training data accumulate. This retraining step may be supervised manually by a data scientist or performed programmatically. If desired, the retrained model can be compared directly to the previous model using A/B testing before it is fully deployed. More information on programmatic retraining in Azure Machine Learning Studio is available here: [Retrain Machine Learning models programmatically](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-retrain-models-programmatically/).
 
-### Example: Contoso Mart  <a name="odcm"></a>
+<a name="odcm"></a>
+### Example: Contoso Mart
 
 Contoso Mart uses one-click deployment to create a predictive web service based on their trained model:
 
