@@ -13,22 +13,22 @@ Contoso Mart is an online retailer that has noticed a disturbing recent trend in
 Connie hopes to recapture this revenue and improve the customer experience by including complementary-product suggestions in the "shopping cart" view of Contoso Mart. The sheer number of products and their rapid turnover prohibit manual curation: automatic detection of complementary products will be necessary.
 
 ## Outline
-- [Data Acquisition](#Data-Acquisition)
-   - [Sales Transaction Data](#Sales-Transaction-Data)
-   - [Optional: Product and Transaction Descriptions](#Optional)
-- [Model Selection](#Model-Selection)
-   - [Item-to-Item Collaborative Filtering](#Item-to-Item-Collaborative-Filtering)
-   - [Association Rules](#Association-Rules)
-- [Best Practices for Model Training and Evaluation](#Best-Practices-for-Model-Training-and-Evaluation)
-   - [Evaluation Set Creation](#Evaluation-Set-Creation)
-   - [Hyperparameter Fitting](#Hyperparameter-Fitting)
-   - [Evaluation](#Evaluation)
-- [Operationalization and Deployment](#Operationalization-and-Deployment)
-   - [Creating Predictive Web Services from Trained Models](#Creating-Predictive-Web-Services-from-Trained-Models)
+- [Data Acquisition](#dataacquisition)
+   - [Sales Transaction Data](#salestransactiondata)
+   - [Optional: Product and Transaction Descriptions](#optional)
+- [Model Selection](#modelselection)
+   - [Item-to-Item Collaborative Filtering](#itemitem)
+   - [Association Rules](#associationrules)
+- [Best Practices for Model Training and Evaluation](#bestpractices)
+   - [Evaluation Set Creation](#evaluationset)
+   - [Hyperparameter Fitting](#hyperparameters)
+   - [Evaluation](#evaluation)
+- [Operationalization and Deployment](#operationalization)
+   - [Creating Predictive Web Services from Trained Models](#predictive)
    - [A/B Testing](#ab)
-   - [Model Retraining](#Model-Retraining)
+   - [Model Retraining](#retraining)
 
-## Data Acquisition
+## Data Acquisition <a name="dataacquisition"></a>
 
 The relevant input data for this use case are transaction-level sales records from which we can extract which products have been purchased together. The volume of transaction data needed to accurately detect "frequently bought together" patterns will vary with the distributions of:
 * Number of items per transaction: for example, single-item purchases are non-informative
@@ -37,7 +37,7 @@ The relevant input data for this use case are transaction-level sales records fr
 
 When sales transaction data are not available in sufficient quantity, synthetic transactions reflecting expected purchase patterns may replace or augment historical records.
 
-### Sales Transaction Data
+### Sales Transaction Data <a name="salestransactiondata"></a>
 Like many online retailers, Contoso Mart stores its transactional data in a semi-structured format to accommodate the variability in number of products per transaction (among other advantages). Typical sales records resemble the following:
 ```
 {
@@ -76,13 +76,13 @@ Like many retailers, Contoso Mart tracks its offerings in a hierarchical scheme 
 
 Understanding a retailer's identifier hierarchy is necessary to select a level at which to aggregate data and make recommendations. In Contoso Mart's case, it seems appropriate to make "frequently bought together" selections based on product IDs rather than SKUIDs. This choice offers two major benefits: (i) we will have increased power for accurate pattern detection because the number of observations per product ID is larger, and (ii) customers will receive a suggestion to purchase a product and can select their preferred SKU themselves.
 
-### Optional: Product and Transaction Descriptions <a name="Optional"></a>
+### Optional: Product and Transaction Descriptions <a name="optional"></a>
 
 As we will describe further in the Model Selection section below, new products pose a challenge to recommender systems because they have no/few training observations on which to learn purchase patterns. Some recommender models can use a supplied list of product details to identify current items that are similar to a new item; this information can be used to produce appropriate recommendations for the new item even before the first sale has occurred. Most retailers maintain a product catalog containing details such as brand, ontology (place within a product hierarchy, e.g. "baked goods, bread, pre-sliced loaves"), seasonality, etc. that can be used for this purpose. Sale transaction details like time of day, day of week, number of products, total price, etc. can also help identify similarities between transactions, potentially improving recommendations.
 
-## Model Selection
+## Model Selection <a name="modelselection"></a>
 
-### Item-to-Item Collaborative Filtering
+### Item-to-Item Collaborative Filtering <a name="itemitem"></a>
 
 Collaborative filtering algorithms can leverage large, sparse datasets to produce recommendations. Most such models expect input in the form of triplets representing a user id, product id, and a "rating": a numerical indication of the affinity between the user and product. The "rating" may be derived from a literal product review or other behaviors indicating interest or dislike, e.g. a product purchase or product return. Item-to-item collaborative filtering algorithms identify similar products, i.e. products which were rated similarly by the same users.
 
@@ -107,11 +107,16 @@ Several options for training and deploying collaborative filtering models are av
 
 <p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/frequently_bought_together/screenshots/item_to_item_experiment_graph.PNG?raw=true"></p>
 
-The **[Recommendations API](https://www.microsoft.com/cognitive-services/en-us/recommendations/documentation)** is a [Microsoft Cognitive Service](https://www.microsoft.com/cognitive-services) API that can be used to remotely train and store a collaborative filtering model (with or without content-based filtering). While some coding experience is required to interact with the API, it offers increased flexibility including the ability to operate on larger datasets and to set rules about which products should be actively promoted or not recommended. The [JJ Foods Inc. customer case study](https://customers.microsoft.com/en-US/story/food-delivery-service-uses-machine-learning-to-revolut) describes an application the Recommendations API to generate Frequently Bought Together recommendations.
+The **[Recommendations API](https://www.microsoft.com/cognitive-services/en-us/recommendations/documentation)** is a [Microsoft Cognitive Service](https://www.microsoft.com/cognitive-services) API that can be used to remotely train and store a collaborative filtering model (with or without content-based filtering). While some coding experience is required to interact with the API, it offers increased flexibility including the ability to operate on larger datasets and to set rules about which products should be actively promoted or not recommended. The [JJ Foods Inc. customer case study](https://customers.microsoft.com/en-US/story/food-delivery-service-uses-machine-learning-to-revolut) describes an application the Recommendations API to generate Frequently Bought Together recommendations. Additional information on using the Recommendations API can be found at the links below:
+- [Recommendations UI](https://recommendations-portal.azurewebsites.net/#/projects)
+- [Recommendations UI Quick Start](https://azure.microsoft.com/en-us/documentation/articles/cognitive-services-recommendations-ui-intro/)
+- [Recommendations API Quick Start](https://azure.microsoft.com/en-us/documentation/articles/cognitive-services-recommendations-quick-start/)
+- [Recommendations API Sample Code](https://github.com/microsoft/Cognitive-Recommendations-Windows)
+- [Recommendations API Reference](https://westus.dev.cognitive.microsoft.com/docs/services/Recommendations.V4.0/operations/56f30d77eda5650db055a3db)
 
 Custom code implementing other forms of collaborative filtering or hybrid recommenders may also be trained or operationalized on Azure, e.g. using [Azure App Service](https://azure.microsoft.com/en-us/services/app-service/) or [Azure Machine Learning Studio](https://studio.azureml.net/).
 
-### Association Rules
+### Association Rules <a name="associationrules"></a>
 
 Association rules describe patterns such as, "If *x* is purchased in a transaction, then *y* will also be purchased in the same transaction," often abbreviated with the shorthand *x* -> *y*. Once identified from sales transaction data, such patterns can be exploited be recommending *y* once *x* has been added to a shopping cart. *x* and *y* may be individual products, but in general they can represent sets of products, e.g.
 
@@ -138,15 +143,15 @@ Exampls incorporating the `arules` package can be found in the Cortana Intellige
 
 <p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/frequently_bought_together/screenshots/association_rules_experiment_graph.PNG?raw=true"></p>
 
-## Best Practices for Model Training and Evaluation
+## Best Practices for Model Training and Evaluation <a name="bestpractices"></a>
 
-### Evaluation Set Creation
+### Evaluation Set Creation <a name="evaluationset"></a>
 
 To accurately assess a model's likely performance after deployment, the sales data used for evaluation (the "test set") should be as independent as possible from the sales data used for training (the "training set"). If the collaborative filtering data type is used, we must be careful to ensure that data are partitioned at the transaction level: all observations for the same transaction should be included in the same set. (This distinction is automatically held for association rules, in which each transaction is represented by a single row containing a list of products.)
 
 A popular partitioning method is to split the transactions chronologically, mimicking the scenario in which a model was trained with all available data up to a certain date, then tested on data collected after that date. Under this scheme, the model cannot learn and apply trends that appeared only after the training date: its performance during testing will therefore better reflect the performance on brand-new data after deployment. By contrast, if transaction partitioning were random, the model's evaluation performance would be artificially inflated since it could learn time-dependent trends in the test set -- an advantage that will not persist once the model is deployed in the real world.
 
-### Hyperparameter Fitting
+### Hyperparameter Fitting <a name="hyperparameters"></a>
 
 It is common practice to reserve a fraction of the training set (either statically by creating a "validation set," or dynamically using cross-validation) to examine the change in the performance of trained models as hyperparameter values are varied. This change in performance may be balanced against the disadvantages of long runtime to select the optimal hyperparameter values.
 
@@ -164,7 +169,7 @@ Among the common hyperparameters used in **association rules** algorithms are:
 
 <p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/frequently_bought_together/screenshots/association_rules_custom_module_parameters.PNG?raw=true"></p>
 
-### Evaluation
+### Evaluation <a name="evaluation"></a>
 
 **Collaborative filtering**
 
@@ -174,9 +179,9 @@ One method for evaluating a collaborative filtering (or hybrid recommender) mode
 
 Association rule mining typically yields a collection of rules, each of which can be evaluated separately on the test set. For each rule, the support and confidence on the withheld data set is determined. Large deviations of these metrics from the values calculated on the training set may indicate that a change of hyperparameters is appropriate. Alternatively, overall efficacy of recommendations can be calculated using the full association rule set by assessing how often the final item added to a user's shopping cart matches the recommendation based on its previous contents.
 
-## Operationalization and Deployment
+## Operationalization and Deployment <a name="operationalization"></a>
 
-### Creating Predictive Web Services from Trained Models
+### Creating Predictive Web Services from Trained Models <a name="predictive"></a>
 
 Once optimal hyperparameters have been identified and the model's performance has been evaluated, a final model is fitted using all available data. A web service must be constructed around this model to accept as input a description of an incomplete shopping cart, and provide "frequently-bought-together" suggestions as output. The web service must gracefully handle cases when the shopping cart is empty, new products are mentioned, recommended products are no longer in the catalog, and/or no recommendation can be made. Web services can be deployed with a single click from Azure Machine Learning Studio, or developed in other environments such as Azure App Services. A few model-specific considerations for web service development are included below.
 
@@ -194,6 +199,6 @@ Before providing a new or upgraded feature to all customers, some online retaile
 
 Multiworld testing is a natural extension of A/B testing to accommodate multiple candidate site versions. Microsoft's [Multiworld Testing Decision Service](http://mwtds.azurewebsites.net/) can be used to automate the gradual selection of a preferred site version based on user behavior.
 
-### Model Retraining
+### Model Retraining <a name="retraining"></a>
 
 Retraining the "frequently-bought-together" model on a scheduled basis will ensure that product suggestions are updated to reflect changes in the product catalog. [Programmatic model retraining](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-retrain-models-programmatically/) is available for models created in Azure Machine Learning Studio. The Recommendations API allows existing models to be updated with an [API call](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-recommendation-api-documentation/#5-model-basic) and tested before promotion to production. If desired, A/B or multiworld testing can be used to phase in retrained models.
