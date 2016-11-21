@@ -207,7 +207,7 @@ When predictions on a minority class are substantially worse than other predicti
 
 **Confusion matrix**
 
-The confusion matrix *C* summaries the number of data points in the test set with each combination of true and predicted labels. Each element *C<sub>lm</sub>* of the confusion matrix is number of data points with true label *l* that were predicted to have label *m*.
+The confusion matrix *C* summarizes the number of data points in the test set with each combination of true and predicted labels. Each element *C<sub>lm</sub>* of the confusion matrix is number of data points with true label *l* that were predicted to have label *m*.
 
 As an example, for the following simple dataset and labels:
 
