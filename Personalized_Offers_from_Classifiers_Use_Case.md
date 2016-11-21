@@ -1,4 +1,4 @@
-### Personalized Offers from Classifiers Use Case
+## Personalized Offers from Classifiers Use Case
 
 ## Executive Summary
 
