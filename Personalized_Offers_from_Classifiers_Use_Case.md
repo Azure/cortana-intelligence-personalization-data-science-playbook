@@ -55,7 +55,7 @@ A user's browsing history may shed light on longterm preferences and current pur
 
 **Purchases, Product Reviews, and Wishlists**
 
-Interest in some types of offers -- in particular, product recommendations -- correlates with user interest in specific products. Records of users' purchases, reviews, and "wishlist" contents can be used to predict their interest in a product of interest. Raw data of this type is likely to be sparse: for example, the probability that a user will purchase/review/etc. any given product is low. However, dense features appropriate for training classifier models can be constructed by summing across all products in defined categories.
+Interest in some types of offers -- in particular, product recommendations -- correlates with user interest in specific products. Records of users' purchases, reviews, and "wishlist" contents can be used to predict their interest in a product. Raw data of this type is likely to be sparse: for example, the probability that a user will purchase/review/etc. any given product is low. However, dense features appropriate for training classifier models can be constructed by summing across all products in defined categories.
 
 <a name="descriptors"></a>
 ### User Descriptors
