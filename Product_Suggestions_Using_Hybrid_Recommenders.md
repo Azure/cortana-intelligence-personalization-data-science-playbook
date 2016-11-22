@@ -111,7 +111,7 @@ Users may also visit a product's description page after following an external li
 
 New users at Contoso Mart may not yet have made purchases, left ratings, or navigated the website. Personalized product recommendations can nonetheless be provided using an approach called *content boosting*, which leverages the new user's demographic similarity to existing users of the website. To employ content boosting, information that can be used to assess the similarity between users must be supplied.
 
-Some user descriptors are straightforward to infer from data collected during account creation. For example, a user's shipping address suggests their location, and their chosen appellation (Mr./Ms./Mrs.) reflects their gender. Though age, marital status, and interests are highly relevant for product recommendations, most retailers do not request this information during account creation because it may be considered overly personal or extend the sign-up process unnecessarily. Instead, some retailers request this information after sign-up with the explanation that it will be used to provide more accurate product recommendations. Additional incentivization can be provided by offering a Rewards program that requires users to share additional demographic data.
+Some user descriptors are straightforward to infer from data collected during account creation. For example, a user's shipping address suggests their location, and their chosen appellation (Mr./Ms./Mrs.) reflects their gender. Though age, marital status, and interests are highly relevant for product recommendations, most retailers do not request this information during account creation because it may be considered overly personal or extend the sign-up process unnecessarily. Instead, some retailers request this information after sign-up with the explanation that it will be used to provide more accurate product recommendations. Additional incentivization can be provided by offering a Rewards program that requires users to share additional demographic data. Retailers may also consult a third party or use imputation/inference to fill in missing data as necessary.
 
 Temporary or redundant accounts typically include only a fraction of a user's purchases and other behaviors. When multiple accounts can be attributed with high confidence to a single customer, recommendation quality may be improved by combining activities across accounts. Information available in user descriptions, including full name and address, may be used to identify candidate merges. Infrequently-used accounts that cannot be merged are prime candidates for removal if subsampling is required for speed/resource management during training.
 
@@ -134,7 +134,7 @@ After recommendations have been incorporated into the website, retailers should 
 To calculate these metrics, one must know which recommendations were displayed to each user, whether or not each recommendation was clicked, and whether or not each recommendation resulted in a purchase (within, say, 24 hours of the recommendation being displayed). In Contoso Mart's case, clickthrough data and sales transaction data are stored separately and must be joined together.
 
 <a name="featureextraction"></a>
-## Feature Extraction and Selection
+## Feature Extraction
 
 <a name="affinityscores"></a>
 ### Affinity Scores
@@ -219,13 +219,15 @@ Recommendation systems are under active research in machine learning. While many
 <a name="evaluationset"></a>
 ### Evaluation Set Creation
 
-Accurate evaluation of a trained model's performance requires the use of fresh data points that were not part of the training set. Contoso Mart reserved a portion of the available user-product affinity scores to create a "test set" of data points for use in model evaluation; the remaining affinity scores formed the "training set" used for hyperparameter selection and model training. This standard practice improves the odds that a model's performance on the test set will generalize to future data.
+Accurate evaluation of a trained model's performance requires the use of fresh data points that were not part of the training set. Contoso Mart reserved a portion of the available user-product affinity scores to create a "test set" of data points for use in model evaluation; the remaining affinity scores formed the "training set" used for hyperparameter selection, feature selection (if necessary), and model training. This standard practice improves the odds that a model's performance on the test set will generalize to future data.
 
 Random splitting of observations into training and test sets may not be ideal for model evaluation. Contoso Mart hoped to be able to compare the performance on the model on brand new products/users vs. products and users who had many observations in the training set ("frequently-returning users"). This was made possible by ensuring that a substantial fraction of users/products were only observed in the test set. Models deployed in Azure Machine Learning Studio may use the Split Data module's Recommender Split mode to automate this form of partitioning.
 
 <p align="center"><img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_split_data_module.PNG?raw=true"></p>
 
 Another common method for observation partitioning is to divide observations chronologically. Unlike a random split, the chronologically-defined training set would not contain any observations that might unfairly "reveal" future trends during model training. This mimics the real-world scenario in which the model is trained on all data available on a certain date, then tested on new data as it arrives. Despite these potential advantages, Contoso Mart chose not to perform a chronological split because evaluating the model would require recalculating affinity scores as additional evidence (user behaviors like purchases and reviews) accumulated over time.
+
+After the model has been evaluated with satisfactory results, the model can be retrained using the full dataset to maximize recommendation quality for all active users and reflecting recent trends.
 
 <a name="hyperparameters"></a>
 ### Hyperparameter Selection
@@ -263,7 +265,7 @@ In general, affinity score predictions on the test set will be more accurate for
 
 The first step in operationalizing the hybrid recommender's product suggestions is the creation of a predictive web service. Because Contoso Mart implemented their model in Azure Machine Learning Studio, they were able to generate the corresponding predictive web service with a single click. The web service's functionality can be tested using sample code, a web interface, or an Excel plug-in.
 
-Many retailer websites are created using common programming languages that support calling and parsing responses from web services. The web service's sample code snippet can be integrated into the existing website code to request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page. To reduce lag and ensure variability in recommendations, some retailers request multiple recommendations for each active user and store these for quick access during future page rendering.
+Many retailer websites are created using common programming languages that support calling and parsing responses from web services. The web service's sample code snippet can be integrated into the existing website code to request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page. To reduce lag and ensure variability in recommendations, some retailers request multiple recommendations for each active user and store these for quick reference during future page rendering.
 
 <a name="ab"></a>
 ### A/B and Multiworld Testing
