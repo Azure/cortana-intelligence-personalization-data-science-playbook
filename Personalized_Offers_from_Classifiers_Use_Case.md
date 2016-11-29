@@ -125,7 +125,7 @@ A number of characteristics should be considered when selecting a classification
 - Training and scoring resource requirements
 - Availability of confidence metrics for predictions
 - Availability of methods for assessing feature importance
-- Avalability of model-specific methods to reduce overfitting
+- Availability of model-specific methods to reduce overfitting
 - Ability to succinctly explain results
 
 For a detailed comparison of several classifier models, please see our [broader discussion of algorithm selection](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-algorithm-choice/) or Martin Thoma's blog post on [Comparing Classifiers](https://martin-thoma.com/comparing-classifiers/).
