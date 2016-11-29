@@ -45,7 +45,7 @@ The first stage in implementation of a classifier for personalized offer recomme
 
 **Offer Clickthroughs**
 
-User responses to presented offers -- i.e., whether each offer was clicked or ignored -- constitute the most direct form of evidence for a user's interest or disinterest in an offer. In the most common data collection scheme, a retailer records each offer displayed to a user and each time an offer is clicked: these records can be compared later, using timestamps or unique URIs, to determine which offers were ignored. For technical simplicity, some retailers choose to record only clickthrough events.
+User responses to presented offers -- i.e., whether each offer was clicked or ignored -- constitute the most direct form of evidence for a user's interest or disinterest in an offer. In the most common data collection scheme, a retailer records each offer displayed to a user and each time an offer is clicked: these records can be compared later, using timestamps or unique URIs, to determine which offers were ignored. For technical simplicity, some retailers choose to record only clickthrough events. Multiple clickthrough observations may be available for a given user.
 
 Note that offer clickthrough data can only be collected after offers start being displayed on the retailer's website. A retailer can begin collecting data by displaying offers at random or in a targeted fashion. If the distribution of offers displayed to each user is non-random, downsampling (or upsampling) may be used to balance the dataset.
 
@@ -67,10 +67,10 @@ Many online retailers request and store customer details that are likely to corr
 
 Contoso Mart sells twenty-five products. Every time a user requests a web page, an advertisement for one of these products is included on the page. (In other words, the type of offer that Contoso Mart hopes to personalize is a product suggestion.) Before implementing personalized offers, Contoso Mart highlighted a randomly-selected offer and recorded the following information for each clickthrough event:
 - The product was highlighted in the offer (encoded using 25 one-hot variables)
-- The webpage where the offer was displayed (25 possibilities, one corresponding to each product)
+- The webpage where the offer was displayed (one categorical feature with 25 possible values, one corresponding to each product)
 - The count of the user's visits to each of the 25 webpages in the past minute, hour, or day (tallies maintained in near-real time using [Azure Event Hub](https://azure.microsoft.com/en-us/documentation/articles/event-hubs-overview/) and [Azure Stream Analytics](https://azure.microsoft.com/en-us/services/stream-analytics/))
 
-The resulting dataset has 101 features. If the number of products/web pages were larger, it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
+The resulting dataset has 101 (25 + 1 + 3 * 25) features. If the number of products/web pages were larger, it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
 
 <a name="extractionselection"></a>
 ## Feature Extraction and Selection
@@ -82,18 +82,18 @@ The core component of the model training/evaluation datasets is the offer clickt
 
 **Rolling windows**
 
-Raw event logs typically include information on only one event per row. Rolling window techniques can be applied to these logs to create new features that count the number of events which occurred in the *n* minutes prior to each time point. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate the clickthrough data with the relevant rolling event counts. This technique can be used to create potentially-useful features such as "number of user's visits to page x in last hour".
+Raw event logs typically include information on only one event per row. Rolling window techniques can be applied to these logs to create new features that count the number of events which occurred in the *n* minutes prior to each timepoint. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate the clickthrough data with the relevant rolling event counts. This technique can be used to create potentially-useful features such as "number of user's visits to page x in last hour".
 
-Data scientists who introduce rolling counts during feature extraction must give careful thought to how these features will be computed after the model is deployed. The calculations which they perform to construct features during offline model development may not be ideal in the time-sensitive context of the operationalized model.  Data engineers and solution architects can help design a solution for near-real time calculation of these rolling counts, so that they can be provided directly as inputs to the model. If a processing delay is expected for rolling count calculation, that delay should be simulated during offline feature creation. (Once the solution is operational, rolling counts can be stored with other details of each offer clickthrough, and will no longer need to be generated offline through feature extraction.)
+Data scientists who introduce rolling counts during feature extraction must give careful thought to how these features will be computed after the model is deployed. The calculations which they perform to construct features during offline model development may not be ideal in the time-sensitive context of the operationalized model.  Data engineers and solution architects can help design a solution for near-real time calculation of these rolling counts, so that they can be provided directly as inputs to the model. If a processing delay is expected for rolling count calculation, that delay can be simulated during offline feature creation, so that the model's performance during formal evaluation will more closely track its performance on new data after deployment. (Once the solution is operational, rolling counts can be stored with other details of each offer clickthrough, and will no longer need to be generated offline through feature extraction.)
 
 **Inferred User Descriptors**
 
-User descriptors are most useful when they have low "missingness" (fraction of data points with unknown value). Most online retailers collect user interest and demographics on an opt-in basis, resulting in high missingness. The utility of these features can be improved by filling in missing information with an educated guess, e.g. through imputation or classification. For example, information that is commonly provided for shipping purposes, like name and location, could be used to infer other properties like gender, socioeconomic status, or age.
+User descriptors are most useful when they have low "missingness" (fraction of data points with unknown value). Most online retailers collect user interest and demographics on an opt-in basis, resulting in high missingness. The utility of these features can be improved by filling in missing information with data obtained from a third party, or with an educated guess, e.g. through imputation or classification. For example, information that is commonly provided for shipping purposes, like name and location, could be used to infer other properties like gender, socioeconomic status, or age.
 
 <a name="selection"></a>
 ### Feature Selection
 
-During the feature extraction stage, a large number of features may be created from the available data. For example, when employing page view data, we may create a separate feature for rolling counts of page views for each page, in each of multiple time windows. Some of these features will not be correlated to the label of interest (the identifier of the clicked offer) or even detract from a model's predictive power through overfitting. Such features should be removed during the feature selection stage to reduce training time and the potential for model overfitting. The features to retain can be selected using correlation or mutual information with the label, forward selection or backward elimination, and a variety of model-specific approaches (e.g. feature importance for decision forests).
+During the feature extraction stage, a large number of features may be created from the available data. For example, when employing page view data, we may create a separate feature for rolling counts of page views for each page, in each of multiple time windows. Some of these features will not be correlated to the label of interest (the identifier of the clicked offer) or even detract from a model's predictive power through overfitting. Such features should be removed during the feature selection stage to reduce training time and the potential for model overfitting. The features to retain can be selected using correlation or mutual information with the label, forward selection or backward elimination, and a variety of model-specific approaches (e.g. feature importance for decision forests). Perfectly-predictive features such as unique user identifiers should also be removed prior to model training. For some feature selection methods, it is preferable to use a subset of training data, either defined explicitly or created through cross-validation (please see the <a href="#partitioning">Dataset Partitioning</a> section for more information), to ensure that model performance during evaluation reflects likely performance after deployment.
 
 <a name="fescm"></a>
 ### Example: Contoso Mart
@@ -105,7 +105,7 @@ Contoso Mart merges all features of interest into the offer clickthrough data du
 
 Binary classifiers assign one of two possible labels to a given data point based on the values of relevant features. Multiclass classifiers extend this concept, creating a model that assigns one of 3+ labels for each data point. In this use case, we use a multiclass classifier to assign a label indicating which of the possible offers should be displayed (because that offer is deemed most likely to result in a clickthrough event). 
 
-Major advantages of classifiers over alternatives like hybrid recommendation models include their potentially faster speed, lower resource requirements, and improved explainability. However, classifiers are challenged by the introduction of new classes and very large numbers of classes. (Hybrid recommendation models may be preferable in these cases: see the following example use case.)
+Major advantages of classifiers over alternatives like hybrid recommendation models include their potentially faster speed, lower resource requirements, and improved explainability. However, classifiers are challenged by the introduction of new classes and very large numbers of classes. (Hybrid recommendation models may then be preferable: see the following example use case.)
 
 <a name="types"></a>
 ### Model Types
@@ -125,7 +125,7 @@ A number of characteristics should be considered when selecting a classification
 - Training and scoring resource requirements
 - Availability of confidence metrics for predictions
 - Availability of methods for assessing feature importance
-- Availability of model-specific methods to reduce overfitting
+- Avalability of model-specific methods to reduce overfitting
 - Ability to succinctly explain results
 
 For a detailed comparison of several classifier models, please see our [broader discussion of algorithm selection](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-algorithm-choice/) or Martin Thoma's blog post on [Comparing Classifiers](https://martin-thoma.com/comparing-classifiers/).
@@ -148,7 +148,7 @@ Some binary classifier models have also been extended (with model-specific algor
 <a name="implementation"></a>
 ### Implementation
 
-[Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a cloud-based graphical environment for machine learning data preparation and model development. Many of the multiclass classifier models mentioned above can be incorporated into AML through a code-free drag-and-drop interface, but data scientists can also import R and Python code to implement custom models if they prefer (and share these examples within the community). During model development, intermediate results can be examined using automated summaries, or custom code and visualizations in Python/R Jupyter notebooks. AML also facilitates deployment of predictive web services from trained models.
+[Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a cloud-based graphical environment for machine learning data preparation and model development. Many of the multiclass classifier models mentioned above can be incorporated into AML through a code-free drag-and-drop interface, but data scientists can also import R and Python code to implement custom model types if they prefer. During model development, intermediate results can be examined using automated summaries, or custom code and visualizations in Python/R Jupyter notebooks. AML also facilitates deployment of predictive web services from trained models. Data scientists can share their work and find examples of models constructed in AML Studio in the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com/).
 
 [Azure App Services](https://azure.microsoft.com/en-us/documentation/services/app-service/) is another option for the deployment of models trained locally. Data scientists can create predictive web services using a wide variety of programming languages and common tools like Flask, Django, and Bottle. The Web App Service can also be used for the construction of web pages that make use of the web service.
 
@@ -171,11 +171,11 @@ This type of multiclass classifier is one of many available as a built-in module
 <a name="partitioning"></a>
 ### Dataset Partitioning
 
-It is common practice to partition the available data points into two sets: a *training set* used to select hyperparameters (if applicable) and train the model, and a *test set* for evaluating the trained model's accuracy. This practice improves the odds that a model's performance on the test set will accurately reflect its performance on future data.
+It is common practice to partition the available data points into two sets: a *training set* used to select hyperparameters/features (if applicable) and train the model, and a *test set* for evaluating the trained model's accuracy. This practice improves the odds that a model's performance on the test set will accurately reflect its performance on future data.
 
-Random splitting of observations into training and test sets may not be ideal for model evaluation. When data points collected from the same user appear in both the training and test set, the model may learn their specific behaviors and thus give more accurate predictions than it would provide for them than for new users. To ensure that the model generalizes well, it may be wise to partition data points at the user level.
+Random splitting of observations into training and test sets may not be ideal for model evaluation. When data points collected from the same user appear in both the training and test set, the model may learn their specific behaviors and thus give more accurate predictions for them than it would provide for new users. To ensure that the model generalizes well, it may be wise to partition data points at the user level during model evaluation. Once a model's performance is determined to be satisfactory, the model can be retrained using all available data to maximize performance on all current users after deployment.
 
-Another common partitioning method is to divide observations chronologically: observations collected before a certain date would  form the training set, and all more recent observations would form the test set. This arrangement mimics the real-world scenario in which the model is trained on all data available on a certain date, then tested on new data as it arrives. The performance of the trained model on the test set is realistic in the sense that the model will have no knowledge of any trends that arise after the training date. (By contrast, if the data were partitioned randomly, a model would likely be trained using some data points from every time period, and therefore could "learn" all such trends.)
+Another common partitioning method is to divide observations chronologically: observations collected before a certain date would  form the training set, and all more recent observations would form the test set. This arrangement mimics the real-world scenario in which the model is trained on all data available on a certain date, then tested on new data as it arrives. The performance of the trained model on the test set is realistic in the sense that the model will have no knowledge of any trends that arise after the training date. (By contrast, if the data were partitioned randomly, a model would likely be trained using some data points from every time period, and therefore could "learn" all such trends.) If the model's performance on the evaluation set is acceptable, the model may be retrained using the full dataset before deployment.
 
 <a name="hyperparameters"></a>
 ### Hyperparameter Selection
@@ -280,7 +280,7 @@ For additional information on model evaluation in AML Studio, please see Gary Er
 
 After evaluation reveals that a trained model is fit for operationalization, a web service can be created to surface its recommendations. Depending on how the web service is deployed, it may be necessary to explicitly define the web service's input and output schema, i.e., the input data format needed to call the web service, and the format of the results to be returned. In Azure Machine Learning Studio, a predictive web service can be created from a trained model with a single click and tested using a graphical interface, Excel plug-in, or automatically-generated sample code. Developers using Azure Web Apps can also use common web service creation tools like [Flask](https://azure.microsoft.com/en-us/documentation/articles/web-sites-python-create-deploy-flask-app/), [Bottle](https://azure.microsoft.com/en-us/documentation/articles/web-sites-python-create-deploy-bottle-app/), and [Django](https://azure.microsoft.com/en-us/documentation/articles/web-sites-python-create-deploy-django-app/).
 
-Many retailer websites can be modified to request a personalized offer recommendation from the web service during page loading; the recommended offer's image and link can then be incorporated into the webpage in time for rendering.
+Many retailers pre-generate personalized offer recommendations from the web service for each user, and store these recommendations for fast incorporation during webpage rendering.
 
 <a name="ab"></a>
 ### A/B and Multiworld Testing
