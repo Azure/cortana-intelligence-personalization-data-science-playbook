@@ -82,7 +82,7 @@ The core component of the model training/evaluation datasets is the offer clickt
 
 **Rolling windows**
 
-Raw event logs typically include information on only one event per row. Rolling window techniques can be applied to these logs to create new features that count the number of events which occurred in the *n* minutes prior to each timepoint. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate the clickthrough data with the relevant rolling event counts. This technique can be used to create potentially-useful features such as "number of user's visits to page x in last hour".
+Raw event logs typically include information on only one event per row. Rolling window techniques can be applied to these logs to create new features that count the number of events which occurred in the *n* minutes prior to each time point. We can then outer join these logs with the main dataset by timestamp (and, if necessary, forward-fill) to annotate the clickthrough data with the relevant rolling event counts. This technique can be used to create potentially-useful features such as "number of user's visits to page x in last hour".
 
 Data scientists who introduce rolling counts during feature extraction must give careful thought to how these features will be computed after the model is deployed. The calculations which they perform to construct features during offline model development may not be ideal in the time-sensitive context of the operationalized model.  Data engineers and solution architects can help design a solution for near-real time calculation of these rolling counts, so that they can be provided directly as inputs to the model. If a processing delay is expected for rolling count calculation, that delay should be simulated during offline feature creation. (Once the solution is operational, rolling counts can be stored with other details of each offer clickthrough, and will no longer need to be generated offline through feature extraction.)
 
@@ -105,7 +105,7 @@ Contoso Mart merges all features of interest into the offer clickthrough data du
 
 Binary classifiers assign one of two possible labels to a given data point based on the values of relevant features. Multiclass classifiers extend this concept, creating a model that assigns one of 3+ labels for each data point. In this use case, we use a multiclass classifier to assign a label indicating which of the possible offers should be displayed (because that offer is deemed most likely to result in a clickthrough event). 
 
-Major advantages of classifiers over alternatives like hybrid recommendation models include their potentially faster speed, lower resource requirements, and improved explainability. However, classifiers are challenged by the introduction of new classes and very large numbers of classes. (Hybrid recommendation models may be preferable in these cases: se the following example use case.)
+Major advantages of classifiers over alternatives like hybrid recommendation models include their potentially faster speed, lower resource requirements, and improved explainability. However, classifiers are challenged by the introduction of new classes and very large numbers of classes. (Hybrid recommendation models may be preferable in these cases: see the following example use case.)
 
 <a name="types"></a>
 ### Model Types
@@ -125,7 +125,7 @@ A number of characteristics should be considered when selecting a classification
 - Training and scoring resource requirements
 - Availability of confidence metrics for predictions
 - Availability of methods for assessing feature importance
-- Avalability of model-specific methods to reduce overfitting
+- Availability of model-specific methods to reduce overfitting
 - Ability to succinctly explain results
 
 For a detailed comparison of several classifier models, please see our [broader discussion of algorithm selection](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-algorithm-choice/) or Martin Thoma's blog post on [Comparing Classifiers](https://martin-thoma.com/comparing-classifiers/).

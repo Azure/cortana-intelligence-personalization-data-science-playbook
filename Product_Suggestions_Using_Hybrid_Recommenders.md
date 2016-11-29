@@ -90,7 +90,7 @@ Purchases are strong indicators of affinity between users and products. Purchase
 }
 ```
 
-Semi-structured data may be flattened into relational form, or processed in its native form using appropriate sofware: [SQL syntax and several programming languages](https://azure.microsoft.com/en-us/documentation/articles/documentdb-introduction/) can be used to interact with DocumentDB NoSQL databases, and most programming languages offer packages for parsing raw JSON files. For retailers that track items using both stock-keeping unit (SKU) and product identifiers, we recommend providing suggestions at the product level. Pairs of user and product identifiers should be extracted from the sales transaction data, along with the date of purchase if desired.
+Semi-structured data may be flattened into relational form, or processed in its native form using appropriate software: [SQL syntax and several programming languages](https://azure.microsoft.com/en-us/documentation/articles/documentdb-introduction/) can be used to interact with DocumentDB NoSQL databases, and most programming languages offer packages for parsing raw JSON files. For retailers that track items using both stock-keeping unit (SKU) and product identifiers, we recommend providing suggestions at the product level. Pairs of user and product identifiers should be extracted from the sales transaction data, along with the date of purchase if desired.
 
 **Reviews and Product Returns**
 
@@ -168,12 +168,12 @@ The Azure ecosystem provides several options for implementing hybrid recommender
 <a name="matchbox"></a>
 ### Matchbox Recommender in Azure Machine Learning Studio
 
-[Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a graphical environment for analytics and web service production. AML Studio's built-in hyrid model, the [Matchbox Recommender](https://www.microsoft.com/en-us/research/publication/matchbox-large-scale-bayesian-recommendations/), can be trained and stored, used to create a web service that quickly generates product suggestions for a user of interest during page loading, and programmatically retrained on a scheduled basis. The Matchbox Recommender's major advantages over other methods discussed below include code-free implementation and avoidance of recommendations matching prior observations; as of this writing, however, the Matchbox Recommender is limited to 10 GB of training data.
+[Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a graphical environment for analytics and web service production. AML Studio's built-in hybrid model, the [Matchbox Recommender](https://www.microsoft.com/en-us/research/publication/matchbox-large-scale-bayesian-recommendations/), can be trained and stored, used to create a web service that quickly generates product suggestions for a user of interest during page loading, and programmatically retrained on a scheduled basis. The Matchbox Recommender's major advantages over other methods discussed below include code-free implementation and avoidance of recommendations matching prior observations; as of this writing, however, the Matchbox Recommender is limited to 10 GB of training data.
 
 <p align="center">
 <img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_graph.PNG?raw=true"></p>
 
-The Matchbox Recommender can be used to predict affinties of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). The responsibility of combining all known behaviors for each user-product pair into a single affinity score lies with the retailer. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
+The Matchbox Recommender can be used to predict affinities of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). The responsibility of combining all known behaviors for each user-product pair into a single affinity score lies with the retailer. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
 
 Examples of recommender systems built with the Matchbox Recommender can be examined and deployed from the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com) with a free account:
 - [Product Recommendations via Hybrid Recommender](http://gallery.cortanaintelligence.com/Experiment/Product-Recommendations-via-Hybrid-Recommender-1) 

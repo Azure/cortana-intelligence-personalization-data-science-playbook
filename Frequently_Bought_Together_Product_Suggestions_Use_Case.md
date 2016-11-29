@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Customers often purchase complementary products in a single order. Forgetting to include relevant accompaniments can leave other items temporarily inoperable or unenjoyable, decreasing satisfaction and necessitating a last-minute purchase of the missing items. Fortunately, relevant products can be suggested to customers based on their other intended purchases using co-occurence patterns learned from sales transaction data. These "frequently bought together" product suggestions drive both revenue and customer satisfaction.
+Customers often purchase complementary products in a single order. Forgetting to include relevant accompaniments can leave other items temporarily inoperable or unenjoyable, decreasing satisfaction and necessitating a last-minute purchase of the missing items. Fortunately, relevant products can be suggested to customers based on their other intended purchases using co-occurrence patterns learned from sales transaction data. These "frequently bought together" product suggestions drive both revenue and customer satisfaction.
 
 Unlike product recommendations based on long-term user characteristics like past purchases and demographics, "frequently bought together" suggestions are personalized using a user's very recent shopping behavior, viz., which items are currently in their shopping cart. (Historical user-specific features are less informative when predicting forgotten products in the current transaction.) Many online retailers display both types of product suggestions to consumers because they satisfy complementary goals.
 
@@ -96,7 +96,7 @@ transaction        items       ->  transactionid  productid   rating
                                          2          chips        5
                                          2         spinach       1
 ```
-Hybrid methods that combine collaborative filtering with content-based filtering can be used to create recommenders that accommodate new products without requiring retraining. Content-based filtering identifies similar products based on supplied descriptions (brand, category, weight, etc.), and can tehrefore be used with a new product even before any sales data accumulates. Many retailers maintain the necessary information for content-based filtering in their product catalog. Features of individual transactions (time of day, day of week, location, etc.) can also be used for content-based filtering if desired.
+Hybrid methods that combine collaborative filtering with content-based filtering can be used to create recommenders that accommodate new products without requiring retraining. Content-based filtering identifies similar products based on supplied descriptions (brand, category, weight, etc.), and can therefore be used with a new product even before any sales data accumulates. Many retailers maintain the necessary information for content-based filtering in their product catalog. Features of individual transactions (time of day, day of week, location, etc.) can also be used for content-based filtering if desired.
 
 Several options for training and deploying collaborative filtering models are available on Azure:
 
@@ -136,7 +136,7 @@ Downsides of the association rule approach include:
 
 Association rule mining packages are available in R (e.g., [arules](https://cran.r-project.org/web/packages/arules/index.html)) and Python (e.g., [apriori](https://github.com/asaini/Apriori)). These packages typically require that the product identifiers in each transaction be provided in the form of a list: in Contoso Mart's case, this requires parsing each semi-structured sales transaction record to obtain a variable-length list of the products sold in the transaction.
 
-Exampls incorporating the `arules` package can be found in the Cortana Intelligence Gallery:
+Examples incorporating the `arules` package can be found in the Cortana Intelligence Gallery:
 - [Frequently Bought Together Product Suggestions via Association Rule Mining](http://gallery.cortanaintelligence.com/Experiment/Frequently-Bought-Together-Product-Suggestions-via-Association-Rule-Mining-1): simulated sales transaction data are mined for association rules, which in turn are used to generate product suggestions for incomplete shopping carts
 - [Hai Ning's Association Rules](https://gallery.cortanaintelligence.com/CustomModule/Association-Rules-2): a code-free example introducing the Discover Association Rules custom AML module
 - [Martin Machac's Frequently bought together - market basket analyses using ARULES](https://gallery.cortanaintelligence.com/Experiment/Frequently-bought-together-market-basket-analyses-using-ARULES-1): includes a custom R script to load and run the `arules` package from a Script Bundle

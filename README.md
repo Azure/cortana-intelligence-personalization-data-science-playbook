@@ -6,7 +6,7 @@ Mary Wahl, Ph.D.<br/>
 ## Executive Summary
 
 
-Offer personalization is the selection of displayed advertisements based on customers' personal characteristics and actions. Personalized offers may be used to inform customers of relevant products in large online marketplaces, entice visitors to continue browsing, and remind users of their intended purchases. This playbook, intended for data scientists and other industry professionals, covers best practices for the complete data science process in three common use cases. Each use case follows fictious online retailer Contoso Mart from data acquisition to implementation and refinement of a solution.
+Offer personalization is the selection of displayed advertisements based on customers' personal characteristics and actions. Personalized offers may be used to inform customers of relevant products in large online marketplaces, entice visitors to continue browsing, and remind users of their intended purchases. This playbook, intended for data scientists and other industry professionals, covers best practices for the complete data science process in three common use cases. Each use case follows fictitious online retailer Contoso Mart from data acquisition to implementation and refinement of a solution.
 
 ## Use Cases
 
