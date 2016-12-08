@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Targeted product suggestions based on prior behavior and demographics can help users identify items of interest in large catalogs. In addition to driving increased revenue, such suggestions improve the user's experience by replacing distracting ads with relevant information: in a [recent survey](https://www.listrak.com/about/news-events/Press-Release-Survey-Reveals-80-Percent-of-Email-Readers-Find-It-Useful-When-Emails-Feature-Recommen/), 67% of shoppers enjoyed seeing product recommendations on a retailer's website while shopping. Hybrid recommenders combine collaborative filtering with background information on customers and products to generate high-quality product recommendations on large, sparse datasets while gracefully handling the addition of new products and users over time.
+Targeted product suggestions based on prior behavior and demographics can help users identify items of interest in large catalogs. In addition to driving increased revenue, such suggestions improve the user's experience by replacing distracting ads with relevant information: in a [recent survey](https://www.listrak.com/about/news-events/Press-Release-Survey-Reveals-80-Percent-of-Email-Readers-Find-It-Useful-When-Emails-Feature-Recommen/), 67% of shoppers enjoyed seeing targeted product recommendations on a retailer's website while shopping. Hybrid recommenders combine collaborative filtering with background information on customers and products to generate high-quality product recommendations on large, sparse datasets while gracefully handling the addition of new products and users over time.
 
 ## Sample Use Case: Contoso Mart
 
@@ -48,9 +48,7 @@ Similarly, some actions suggest an absence of affinity:
 * Returning the product after a purchase
 * Ignoring an ad for the product
 
-Below, we list specific considerations for collecting each type of data mentioned above. A few general considerations apply to all data types:
-- User preferences may shift over time. If desired, older observations can be assigned a reduced weight during affinity score calculation.
-- Retailers with large product catalogs will likely find that the average user interacts with a small fraction of products. It is unnecessary (and resource-intensive) to store null observations.
+Below, we list specific considerations for collecting each type of data mentioned above.
 
 **Sales Transactions**
 
@@ -90,7 +88,7 @@ Purchases are strong indicators of affinity between users and products. Purchase
 }
 ```
 
-Semi-structured data may be flattened into relational form, or processed in its native form using appropriate software: [SQL syntax and several programming languages](https://azure.microsoft.com/en-us/documentation/articles/documentdb-introduction/) can be used to interact with DocumentDB NoSQL databases, and most programming languages offer packages for parsing raw JSON files. For retailers that track items using both stock-keeping unit (SKU) and product identifiers, we recommend providing suggestions at the product level. Pairs of user and product identifiers should be extracted from the sales transaction data, along with the date of purchase if desired.
+Semi-structured data may be flattened into relational form, or processed in its native form using appropriate software: [SQL syntax and several programming languages](https://azure.microsoft.com/en-us/documentation/articles/documentdb-introduction/) can be used to interact with DocumentDB NoSQL databases, and most programming languages offer packages for parsing raw JSON files. For retailers that track items using both stock-keeping unit (SKU) and product identifiers, we recommend providing suggestions at the product level. (More observations are available for products than individual SKUs, and differential preferences for SKUs of the same product -- e.g. clothing size or product volume -- are more challenging to predict.) Pairs of user and product identifiers should be extracted from the sales transaction data, along with the date of purchase if desired.
 
 **Reviews and Product Returns**
 
@@ -147,7 +145,7 @@ UserID  ProductID  Affinity
    3        2          7
   ...      ...        ...
 ```
-To arrive at an affinity score, retailers typically combine multiple forms of evidence -- including purchases, ratings, returns, wishlists, recommendation clickthroughs, and product description page visits -- using a combination of analytics and industry knowledge. Contoso Mart calculates affinity scores as a weighted sum of purchase count, product recommendation clickthrough count, and number of ignored product recommendations. The weightings for each event type in affinity score calculation can be explored using a hyperparameter search as described in the [Training and Evaluation](#Training-and-Evaluation) section below.
+To arrive at an affinity score, retailers typically combine multiple forms of evidence -- including purchases, ratings, returns, wishlists, recommendation clickthroughs, and product description page visits -- using a combination of analytics and industry knowledge. Contoso Mart calculates affinity scores as a weighted sum of purchase count, product recommendation clickthrough count, and number of ignored product recommendations. As user preferences may shift with time, it may be desirable to assign a reduced weight to older observations when calculating affinity scores. The weightings for each event type in affinity score calculation can be explored using a hyperparameter search as described in the [Training and Evaluation](#bestpractices) section below.
 
 <a name="augmentation"></a>
 ### User Description Augmentation
@@ -173,7 +171,7 @@ The Azure ecosystem provides several options for implementing hybrid recommender
 <p align="center">
 <img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_graph.PNG?raw=true"></p>
 
-The Matchbox Recommender can be used to predict affinities of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). The responsibility of combining all known behaviors for each user-product pair into a single affinity score lies with the retailer. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
+The Matchbox Recommender can be used to predict affinities of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). Users must supply pre-calculated affinity scores for each user-product pair. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
 
 Examples of recommender systems built with the Matchbox Recommender can be examined and deployed from the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com) with a free account:
 - [Product Recommendations via Hybrid Recommender](http://gallery.cortanaintelligence.com/Experiment/Product-Recommendations-via-Hybrid-Recommender-1) 
