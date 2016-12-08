@@ -237,7 +237,9 @@ Many hybrid recommender implementations require that an affinity score be suppli
 <p align="center">
 <img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/eqns/affinity_score.PNG?raw=true"></p>
 
-where *b* is a constant bias term, *c<sub>i</sub>* is the count of times that behavior *i* was performed for the given user-product pair, and *w<sub>i</sub>* are the weights which determine how strongly each behavior type contributes to the affinity score. (Notice that the affinity scores have been rectified to produce scores that always lie in the range 1-10.) Contoso Mart has applied insider knowledge of the industry to make educated guesses about possible bias and weight values. Cross-validation may be used to compare model performance using a small number of possible parameter sets, with the optimal set used to train the final model.
+where *b* is a constant bias term, *c<sub>i</sub>* is the count of times that behavior *i* was performed for the given user-product pair, and *w<sub>i</sub>* are the weights which determine how strongly each behavior type contributes to the affinity score. (Notice that the affinity scores have been rectified to produce scores that always lie in the range 1-10.)
+
+Contoso Mart has applied insider knowledge of the industry to make educated guesses about possible bias and weight values. Cross-validation may be used to compare model performance using a variety of possible parameter sets. For each parameter set under consideration, affinity scores are calculated, a hybrid recommender is trained using data from the training set (excluding the validation fold), and the hybrid recommender's performance is tested on the validation fold. The parameter set which gives the best model performance is then used to calculate affinity scores and retrain the hybrid recommender using the complete training set.
 
 **Latent Dimension and Training Round Count Parameters**
 
@@ -261,9 +263,9 @@ In general, affinity score predictions on the test set will be more accurate for
 <a name="webservice"></a>
 ### Creating and Consuming a Web Service
 
-The first step in operationalizing the hybrid recommender's product suggestions is the creation of a predictive web service. Because Contoso Mart implemented their model in Azure Machine Learning Studio, they were able to generate the corresponding predictive web service with a single click. The web service's functionality can be tested using sample code, a web interface, or an Excel plug-in.
+The first step in operationalizing the hybrid recommender's product suggestions is the creation of a predictive web service. Because Contoso Mart implemented their model in [Azure Machine Learning Studio](https://studio.azureml.net/), they were able to generate the corresponding predictive web service [with a single click](https://docs.microsoft.com/en-us/azure/machine-learning/machine-learning-publish-a-machine-learning-web-service). The web service's functionality can be tested using [automatically-generated sample code](https://docs.microsoft.com/en-us/azure/machine-learning/machine-learning-consume-web-services), a web interface, or an Excel plug-in.
 
-Many retailer websites are created using common programming languages that support calling and parsing responses from web services. The web service's sample code snippet can be integrated into the existing website code to request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page. To reduce lag and ensure variability in recommendations, some retailers request multiple recommendations for each active user and store these for quick reference during future page rendering.
+Many retailer websites are created using common programming languages that support calling and parsing responses from web services. The web service's [automatically-generated sample code snippet](https://docs.microsoft.com/en-us/azure/machine-learning/machine-learning-consume-web-services) can be integrated into the existing website code to request a product recommendation each time a user loads a webpage, and incorporate that recommendation into the displayed page. To reduce lag and ensure variability in recommendations, many retailers request multiple recommendations for each active user and store these for quick reference during future page rendering.
 
 <a name="ab"></a>
 ### A/B and Multiworld Testing
