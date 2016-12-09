@@ -169,12 +169,12 @@ The Azure ecosystem provides several options for implementing hybrid recommender
 [Azure Machine Learning (AML) Studio](https://studio.azureml.net/) is a graphical environment for analytics and web service production. AML Studio's built-in hybrid model, the [Matchbox Recommender](https://www.microsoft.com/en-us/research/publication/matchbox-large-scale-bayesian-recommendations/), can be trained and stored, used to create a web service that quickly generates product suggestions for a user of interest during page loading, and programmatically retrained on a scheduled basis. The Matchbox Recommender's major advantages over other methods discussed below include code-free implementation and avoidance of recommendations matching prior observations; as of this writing, however, the Matchbox Recommender is limited to 10 GB of training data.
 
 <p align="center">
-<img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_graph.PNG?raw=true"></p>
+<img src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/hybrid_recommender/screenshots/hybrid_recommender_graph.PNG?raw=true" width="400 px" /></p>
 
 The Matchbox Recommender can be used to predict affinities of specific user-product pairs (useful during model validation/evaluation) or to supply a specified number of item recommendations for a specific user (for operationalization). Users must supply pre-calculated affinity scores for each user-product pair. AML Studio provides a wide variety of intuitive tools for model validation and web service deployment.
 
 Examples of recommender systems built with the Matchbox Recommender can be examined and deployed from the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com) with a free account:
-- [Product Recommendations via Hybrid Recommender](http://gallery.cortanaintelligence.com/Experiment/Product-Recommendations-via-Hybrid-Recommender-1) 
+- [Product Recommendations via Hybrid Recommender](http://gallery.cortanaintelligence.com/Experiment/Product-Recommendations-via-Hybrid-Recommender-1) (an extended version of the example experiment screenshot shown above)
 - [Personalized restaurant suggestions based on customer reviews](https://gallery.cortanaintelligence.com/Tutorial/8-Recommendation-System-1)
 - [Movie recommendations based on viewer ratings](https://gallery.cortanaintelligence.com/Experiment/Recommender-Movie-recommendation-3)
 
