@@ -137,7 +137,7 @@ To calculate these metrics, one must know which recommendations were displayed t
 <a name="affinityscores"></a>
 ### Affinity Scores
 
-The standard input for collaborative filtering algorithms is a list of user-product pairs along with a calculated affinity score:
+The standard input for collaborative filtering algorithms is a list of user-product pairs. For each pair, an "affinity score" indicating the probability that the user would enjoy the product is also included:
 ```
 UserID  ProductID  Affinity
    1        1         10
@@ -145,7 +145,7 @@ UserID  ProductID  Affinity
    3        2          7
   ...      ...        ...
 ```
-To arrive at an affinity score, retailers typically combine multiple forms of evidence -- including purchases, ratings, returns, wishlists, recommendation clickthroughs, and product description page visits -- using a combination of analytics and industry knowledge. Contoso Mart calculates affinity scores as a weighted sum of purchase count, product recommendation clickthrough count, and number of ignored product recommendations. As user preferences may shift with time, it may be desirable to assign a reduced weight to older observations when calculating affinity scores. The weightings for each event type in affinity score calculation can be explored using a hyperparameter search as described in the [Training and Evaluation](#bestpractices) section below.
+Many forms of evidence reflect the affinity between a user and product: purchases, ratings, returns, wishlists, recommendation clickthroughs, and page visits. Affinity scores summarize all of this available data into a single value for each user-product pair. It is not obvious *a priori* how affinity scores should be calculated, but many retailers (including Contoso Mart) use a weighted sum of features. Optimal weighting values can be identified using a hyperparameter search as described in the [Training and Evaluation](#bestpractices) section below. As user preferences may shift with time, it may also be desirable to assign a reduced weight to older observations when calculating affinity scores. 
 
 <a name="augmentation"></a>
 ### User Description Augmentation
