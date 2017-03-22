@@ -293,7 +293,7 @@ Since personalized offers often contribute significantly to revenue and are disp
 <a name="retraining"></a>
 ### Model Retraining
 
-The multiclass classifier should be retrained as the selection of available offers changes and additional training data accumulate. This retraining step may be supervised manually by a data scientist or performed programmatically. If desired, the retrained model can be compared directly to the previous model using A/B testing before it is fully deployed. More information on programmatic retraining in Azure Machine Learning Studio is available here: [Retrain Machine Learning models programmatically](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-retrain-models-programmatically/).
+The classifier should be retrained as the selection of available offers changes and additional training data accumulate. This retraining step may be supervised manually by a data scientist or performed programmatically. If desired, the retrained model can be compared directly to the previous model using A/B testing before it is fully deployed. More information on programmatic retraining in Azure Machine Learning Studio is available here: [Retrain Machine Learning models programmatically](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-retrain-models-programmatically/).
 
 <a name="odcm"></a>
 ### Example: Contoso Mart
@@ -302,4 +302,6 @@ Contoso Mart uses one-click deployment to create a predictive web service based 
 
 <p align="center"><img alt="Predictive Experiment Graph" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/predictive_experiment_graph.PNG?raw=true"></p>
 
-Each time a user requests to load a web page, Contoso Mart's web app calls the predicted AML web service to request a recommendation. The web service returns the identifier for a personalized offer, which is used during page rendering to add the offer's image and hyperlink to a page template. To monitor the personalized offers' efficacy, Contoso Mart continues to record all clickthrough events to Azure Blob Storage, from which they are regularly transferred to SQL Data Warehouse for long-term storage, analysis, and display via a Power BI dashboard.
+Each time a user requests to load a web page, Contoso Mart's Azure Function calls the web service to predict whether the user would click on an offer for each of the 25 products. The web service returns the probability of clickthrough for each product, which Azure Functions uses to identify the three products of greatest potential interest to the customer. The Azure Function uses this information, along with rules provided by the retailer about which offers to prioritize, to choose the final offer to be displayed. Finally, the offer selected by the Azure Function is embedded into the webpage. Contoso Mart could also precalculate and store offer recommendations for each user to further reduce latency.
+
+To monitor the personalized offers' efficacy, Contoso Mart continues to record all clickthrough events to Azure Blob Storage, from which they are regularly transferred to DocumentDB for long-term storage, analysis, and display via a Power BI dashboard.
