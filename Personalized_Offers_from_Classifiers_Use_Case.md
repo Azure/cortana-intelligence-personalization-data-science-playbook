@@ -23,15 +23,15 @@ Contoso Mart is a fictitious online retailer with a selection of 25 products. Th
    - [Feature Extraction](#extraction)
    - [Feature Selection](#selection)
    - [Example: Contoso Mart](#fescm)
-- [Multiclass Classifier Model Selection](#modelselection)
+- [Classifier Model Selection](#modelselection)
    - [Model Types](#types)
-   - [Construction from Binary Classifiers](#construction)
+   - [Construction of Multiclass Classifiers from Binary Classifiers](#construction)
    - [Implementation](#implementation)
    - [Example: Contoso Mart](#mscm)
 - [Best Practices for Training and Evaluation](#bestpractices)
    - [Dataset Partitioning](#partitioning)
    - [Hyperparameter Selection](#hyperparameters)
-   - [Evaluation Metrics for Multiclass Classifiers](#evaluation)
+   - [Evaluation Metrics for Classifiers](#evaluation)
    - [Example: Contoso Mart](#tecm)
 - [Operationalization and Deployment](#od)
    - [Creating and Consuming a Web Service](#webservice)
@@ -108,9 +108,9 @@ Uninformative features should be identified and removed to reduce the potential 
 Contoso Mart merges all features of interest into the offer clickthrough data during the logging step, ensuring that the model is trained only on features that will be readily available after deployment. Rolling counts of recent page views are maintained using Azure Stream Analytics and Azure Event Hub.
 
 <a name="modelselection"></a>
-## Multiclass Classifier Model Selection
+## Classifier Model Selection
 
-Binary classifiers assign one of two possible labels to a given data point based on the values of relevant features. Multiclass classifiers extend this concept, creating a model that assigns one of 3+ labels for each data point. In this use case, we use a multiclass classifier to assign a label indicating which of the possible offers should be displayed (because that offer is deemed most likely to result in a clickthrough event). 
+Binary classifiers assign one of two possible labels to a given data point based on the values of relevant features. Multiclass classifiers extend this concept, creating a model that assigns one of 3+ labels for each data point. In this use case, Contoso Mart trained a binary classifier to predict whether a given displayed offer would result in a clickthrough. Other retailers may elect to train a multiclass classifier to predict the best of several offer options to display.
 
 Major advantages of classifiers over alternatives like hybrid recommendation models include their potentially faster speed, lower resource requirements, and improved explainability. However, classifiers are challenged by the introduction of new classes and very large numbers of classes. (Hybrid recommendation models may then be preferable: see the following example use case.)
 
@@ -164,13 +164,15 @@ Some binary classifier models have also been extended (with model-specific algor
 
 Contoso Mart chose to implement their classifier model using Azure Machine Learning Studio. A shared experiment showing their model training, scoring, and evaluation process can be found in the [Cortana Intelligence Gallery](https://gallery.cortanaintelligence.com/).
 
-Contoso Mart selected a multiclass logistic regression model based on the following desired features:
+Contoso Mart selected a two-class boosted decision tree model based on the following desired features:
 - Fast training and scoring
 - Low resource requirements
-- Availability of *l<sub>1</sub>* and *l<sub>2</sub>* regularization
 - Explainable results
+- Availability of feature importance metric (Gini)
 
-This type of multiclass classifier is one of many available as a built-in module in AML. If Contoso Mart had preferred, they could have created a multiclass model from any available binary classifier module using the [One-vs-All Multiclass module](https://msdn.microsoft.com/en-us/library/azure/dn905887.aspx), selecting a user-contributed [custom module](https://gallery.cortanaintelligence.com/customModules) available in the Cortana Intelligence Gallery, or scripting their own using R or Python.
+This type of binary classifier is one of many available as a built-in module in AML. Contoso Mart was able to easily compare and contrast the performance of different model types by swapping them into the experiment graph. If Contoso Mart had preferred to use a different model type, they could have used a user-contributed [custom module](https://gallery.cortanaintelligence.com/customModules) available in the Cortana Intelligence Gallery, or scripted their own using R, Python, or C#.
+
+Recognizing that their model would likely suffer from the "cold start problem" -- difficulty making recommendations for new users or offers -- Contoso Mart designed their solution architecture so that offers displayed to new users would be determined by separate, coded logic rather than using the trained machine learning model. This alternative offer display logic is implemented using Azure Functions.
 
 <a name="bestpractices"></a>
 ## Best Practices for Model Training and Evaluation
@@ -190,7 +192,7 @@ Another common partitioning method is to divide observations chronologically: ob
 Some classification models take hyperparameters that tune properties such as strength of regularization, learning rate, and number of training rounds. (For more information on which hyperparameters are available for a given classification model, see the documentation for the machine learning model implementation. Descriptions of classification models in AML Studio can be found [here](https://msdn.microsoft.com/en-us/library/dn905808.aspx).) A range of possible hyperparameter values can be tested to identify the values that produce models with optimal performance on a withheld portion of the training set (usually called a "validation" set), which may be statically-defined or varied via [cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)). In AML Studio, the [Tune Model Hyperparameters](https://msdn.microsoft.com/en-us/library/azure/dn905810.aspx) module can be used to automate hyperparameter selection using cross-validation.
 
 <a name="evaluation"></a>
-### Evaluation Metrics for Multiclass Classifiers
+### Evaluation Metrics for Classifiers
 
 After the test set has been scored using the trained model, the predicted and actual data point labels can be compared using a variety of metrics:
 
@@ -210,7 +212,7 @@ The *average accuracy* is the unweighted average of the class-specific accuracie
 
 <p align="center"><img alt="Average Accuracy" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/average_accuracy.PNG?raw=true"></p>
 
-When predictions on a minority class are substantially worse than other predictions -- which may be caused by the small number of training points available -- the average accuracy will be more deeply impacted than the overall accuracy.
+When predictions on a minority class are substantially worse than other predictions -- which may be caused by the small number of training points available -- the average accuracy will be more deeply impacted than the overall accuracy. Average accuracy is therefore useful for highlighting low accuracy in rare classes.
 
 **Confusion matrix**
 
@@ -246,7 +248,7 @@ There are two common methods for summarizing recall across all classes. The *mac
 
 <p align="center"><img alt="Macro-averaged Recall" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/macro_average_recall.PNG?raw=true"></p>
 
-The *micro-averaged recall*, by contrast, is the a weighted average of the class recalls (with fraction of all datapoints in each class used as the weighting):
+The *micro-averaged recall*, by contrast, is the weighted average of the class recalls (with fraction of all datapoints in each class used as the weighting):
 
 <p align="center"><img alt="Micro-averaged Recall" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/eqns/micro_average_recall.PNG?raw=true"></p>
 
@@ -267,15 +269,7 @@ For additional description of these and other metrics, see [Computing Classifica
 <a name="tecm"></a>
 ### Example: Contoso Mart
 
-Contoso Mart uses Azure Machine Learning Studio to train and evaluate its classifier:
-
-<p align="center"><img alt="Training Experiment Graph" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/training_experiment_graph.PNG?raw=true"></p>
-
-The metrics and confusion matrix described above are automatically generated by the Evaluate Model module, and can be inspected by right-clicking on the module's output port to select the visualization option.
-
-<p align="center"><img alt="Evaluate Model Module Results - Metrics" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/evaluate_model_metrics.PNG?raw=true"><img alt="Evaluate Model Module Results - Confusion Matrix" src="https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/img/classifier/evaluate_model_confusion_matrix.png?raw=true"></p>
-
-If desired, Contoso Mart could also calculate arbitrary metrics of interest using Python and R scripts they create or find online.
+Contoso Mart uses Azure Machine Learning Studio to train and evaluate its classifier. The metrics and confusion matrix described above are automatically generated by the Evaluate Model module, and can be inspected by right-clicking on the module's output port to select the visualization option. If desired, Contoso Mart could also calculate arbitrary metrics of interest using Python and R scripts they create or find online.
 
 For additional information on model evaluation in AML Studio, please see Gary Ericson's [How to evaluate model performance in Azure Machine Learning](https://azure.microsoft.com/en-us/documentation/articles/machine-learning-evaluate-model-performance/)
 
