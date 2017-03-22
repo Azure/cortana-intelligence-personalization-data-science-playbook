@@ -69,17 +69,20 @@ Many online retailers request and store customer details that are likely to corr
 <a name="dacm"></a>
 ### Data Acquisition Example: Contoso Mart
 
-Contoso Mart sells twenty-five products. Every time a user requests a web page, an advertisement for one of these products is included on the page. (In other words, the type of offer that Contoso Mart hopes to personalize is a product suggestion.) Before implementing personalized offers, Contoso Mart highlighted a randomly-selected offer and recorded the following information for each clickthrough event:
-- The product was highlighted in the offer (encoded using 25 one-hot variables)
-- The webpage where the offer was displayed (one categorical feature with 25 possible values, one corresponding to each product)
-- The count of the user's visits to each of the 25 webpages in the past minute, hour, or day (tallies maintained in near-real time using [Azure Event Hub](https://azure.microsoft.com/en-us/documentation/articles/event-hubs-overview/) and [Azure Stream Analytics](https://azure.microsoft.com/en-us/services/stream-analytics/))
+Contoso Mart sells twenty-five products. Every time a user requests the product description page for one of those products, an offer is embedded in the page. Before implementing personalized offers, Contoso Mart embedded an advertisement for a (different) randomly-selected product and recorded the following information for each offer display event:
+- The product that was highlighted in the offer
+- The webpage where the offer was displayed
+- Demographics on the user including location (latitude/longitude), distance from a retail store, gender, auto-renew status, and credit card type
+- The offered product's weight and cost
+- The count of the user's visits to the offered product's webpage in the past minute, hour, or day (tallies maintained in near-real time using [Azure Event Hub](https://azure.microsoft.com/en-us/documentation/articles/event-hubs-overview/) and [Azure Stream Analytics](https://azure.microsoft.com/en-us/services/stream-analytics/))
+- Whether a clickthrough occurred
 
-The resulting dataset has 101 (25 + 1 + 3 * 25) features. If the number of products/web pages were larger, it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
+Because the product offered and webpage displayed are categorical values, each effectively contributes 25 one-hot features to the classification model. If the number of products/web pages were larger, this might have resulted in a model with an untenably large number of features: in that case it might have been advisable to bin products into groups or switch to a hybrid recommender approach.
 
 <a name="extractionselection"></a>
 ## Feature Extraction and Selection
 
-The core component of the model training/evaluation datasets is the offer clickthrough data, which generally contains the label of interest (viz., the identifier for the ad that was clicked), the identifier for the user who clicked it, and a timestamp. The user identifier and timestamp can be used to join the dataset with semi-static user descriptions like demographic properties as well as the user's recent behavior at the time the clickthrough occurred. This process may produce a dataset that includes many features, some of which are uninformative or contribute to overfitting. Feature selection can be used to reduce the feature set while maintaining as much predictive power as possible.
+The core component of the model training/evaluation datasets is the offer clickthrough data, which generally contains the label of interest (viz., whether the user clicked on the offer), the identifier for the user who clicked it, and sometimes a timestamp. The user identifier and timestamp can be used to join the dataset with semi-static user descriptions like demographic properties as well as the user's recent behavior at the time the clickthrough occurred. This process may produce a dataset that includes many features, some of which are uninformative or contribute to overfitting. Feature selection can be used to reduce the feature set while maintaining as much predictive power as possible.
 
 <a name="extraction"></a>
 ### Feature Extraction
@@ -97,12 +100,12 @@ User descriptors are most useful when they have low "missingness" (fraction of d
 <a name="selection"></a>
 ### Feature Selection
 
-During the feature extraction stage, a large number of features may be created from the available data. For example, when employing page view data, we may create a separate feature for rolling counts of page views for each page, in each of multiple time windows. Some of these features will not be correlated to the label of interest (the identifier of the clicked offer) or even detract from a model's predictive power through overfitting. Such features should be removed during the feature selection stage to reduce training time and the potential for model overfitting. The features to retain can be selected using correlation or mutual information with the label, forward selection or backward elimination, and a variety of model-specific approaches (e.g. feature importance for decision forests). Perfectly-predictive features such as unique user identifiers should also be removed prior to model training. For some feature selection methods, it is preferable to use a subset of training data, either defined explicitly or created through cross-validation (please see the <a href="#partitioning">Dataset Partitioning</a> section for more information), to ensure that model performance during evaluation reflects likely performance after deployment.
+Uninformative features should be identified and removed to reduce the potential for model overfitting. Undesirable features can be identified by computing correlation or mutual information with the label, performing forward selection or backward elimination, or by using a variety of model-specific approaches (e.g. feature importance for decision forests). Perfectly-predictive features such as unique user identifiers should also be removed prior to model training. For some feature selection methods, it is preferable to use a subset of training data, either defined explicitly or created through cross-validation (please see the <a href="#partitioning">Dataset Partitioning</a> section for more information), to ensure that model performance during evaluation reflects likely performance after deployment.
 
 <a name="fescm"></a>
 ### Example: Contoso Mart
 
-Contoso Mart merges all features of interest into the offer clickthrough data during the logging step, ensuring that the model is trained only on features that will be readily available after deployment. Rolling counts of recent page views are maintained using Azure Stream Analytics and Azure Event Hub. Contoso Mart did not choose to include static user attributes (demographics, etc.) in their model, but if a table of user attributes had been available, it could simply be joined to the main dataset by the user identifier field.
+Contoso Mart merges all features of interest into the offer clickthrough data during the logging step, ensuring that the model is trained only on features that will be readily available after deployment. Rolling counts of recent page views are maintained using Azure Stream Analytics and Azure Event Hub.
 
 <a name="modelselection"></a>
 ## Multiclass Classifier Model Selection
