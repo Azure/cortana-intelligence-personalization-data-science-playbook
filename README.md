@@ -12,7 +12,7 @@ Offer personalization is the selection of displayed advertisements based on cust
 
 ### Personalized Offers using Classifier Models
 
-Displayed web pages can be customized to include an advertisement deemed most likely to be clicked by a given user. High-quality predictions may leverage records of user behaviors like browsing history and purchases, as well as semi-static attributes like demographics and interests. The example highlighted in this use case is based on the [Cortana Industry Solution](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions) for [Personalized Offers in Online Retail](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions/tree/master/Marketing/Personalized%20Offers), a deployment-ready solution demonstrating the integration of machine learning with other Azure services.
+Displayed web pages can be customized to include an advertisement deemed most likely to be clicked by a given user. High-quality predictions may leverage records of user behaviors like browsing history and purchases, as well as semi-static attributes like demographics and interests. The example highlighted in this use case is based on the [Cortana Intelligence Solution How-to Guide](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions) for [Personalized Offers](https://github.com/Azure/cortana-intelligence-personalized-offers), a deployment-ready solution demonstrating the integration of machine learning with other Azure services.
 
 Click [here](https://github.com/Azure/cortana-intellligence-personalization-data-science-playbook/blob/master/Personalized_Offers_from_Classifiers_Use_Case.md) to learn more about this use case.
 
@@ -30,9 +30,9 @@ Click [here](https://github.com/Azure/cortana-intellligence-personalization-data
 
 ## Further Reading
 
-- [Personalized Offers in Online Retail](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions/tree/master/Marketing/Personalized%20Offers)
+- [Personalized Offers Solution How-to Guide](https://github.com/Azure/cortana-intelligence-personalized-offers) 
 
-    This Cortana Industry Solution is highlighted in the "Personalized Offers using Classifier Models" use case.
+    This Cortana Intelligence Solution use case is highlighted in the "Personalized Offers using Classifier Models" use case.
     
     
 - [Cortana Industry Solutions Repository](https://github.com/Azure/Cortana-Intelligence-Suite-Industry-Solutions)
